@@ -1,0 +1,168 @@
+{
+  "hero": {
+    "label": "Pyrénées-Atlantiques (64)",
+    "title": "Anouck Martin",
+    "texte": [
+      "Psychopraticienne en Psychosynthèse",
+      "& Art-Thérapie"
+    ]
+  },
+  "intro": {
+    "label": "Bienvenue",
+    "title": "Prendre le temps de vous écouter",
+    "texte": [
+      "Vous traversez une période de fatigue, de stress, de questionnement ou de difficulté dans vos relations ?",
+      "Vous aimeriez mieux comprendre ce que vous vivez, retrouver de la clarté et être davantage à l'écoute de vos besoins et de vos envies ?",
+      "Je vous accompagne dans cette exploration, avec douceur et sans jugement."
+    ]
+  },
+  "situations": {
+    "label": "",
+    "title": "Peut-être traversez-vous en ce moment une période où…",
+    "texte": "Si l'une de ces situations vous parle, sachez que vous n'êtes pas seule et qu'un accompagnement est possible.",
+    "cards": [
+      {
+        "label": "🧭",
+        "title": "Vous vous sentez perdue",
+        "texte": "Vous avez du mal à savoir ce que vous voulez vraiment, ce dont vous avez besoin ou quelle direction prendre. Vous vous posez beaucoup de questions et avez parfois l'impression de ne plus très bien savoir qui vous êtes ou ce qui vous correspond."
+      },
+      {
+        "label": "🕯️",
+        "title": "Vous vous sentez épuisée",
+        "texte": "Vous avez beaucoup de choses à gérer et vous avez du mal à souffler. Le stress, les pensées qui tournent en boucle ou des émotions fortes prennent parfois beaucoup de place et vous aimeriez retrouver davantage d'apaisement."
+      },
+      {
+        "label": "💬",
+        "title": "Vos relations vous questionnent",
+        "texte": "Votre couple, votre famille ou votre travail prennent beaucoup de place dans vos préoccupations. Vous pouvez avoir du mal à trouver votre place, à exprimer vos besoins ou à savoir ce qui est juste pour vous, tout en tenant à préserver les personnes qui comptent pour vous."
+      }
+    ],
+    "note": "Vous n'avez pas forcément besoin de savoir exactement ce qui ne va pas. *Nous pouvons prendre le temps de le comprendre ensemble.*"
+  },
+  "ressenti": {
+    "label": "",
+    "title": "Quand ce que vous ressentez prend trop de place",
+    "texte": "Les émotions, le stress ou les pensées qui débordent peuvent envahir le quotidien. Il est possible d'en sortir, pas à pas.",
+    "cards": [
+      {
+        "label": "",
+        "title": "Des émotions qui débordent",
+        "texte": "Vous pleurez souvent, vous avez des crises de colère, vous vous sentez constamment angoissée ou votre moral est de plus en plus bas. Vous êtes fatiguée, vos pensées ne s'arrêtent jamais et vous avez parfois l'impression de ne plus réussir à retrouver votre calme."
+      },
+      {
+        "label": "",
+        "title": "Quand tout devient plus difficile",
+        "texte": "Vous pouvez aussi traverser une période difficile dans votre couple, votre famille ou votre travail, et sentir que tout devient plus difficile à gérer. Ces moments de vie méritent d'être accueillis et soutenus."
+      },
+      {
+        "label": "",
+        "title": "Un espace pour comprendre",
+        "texte": "En séance, je vous accompagne pour comprendre ce que vous vivez et retrouver progressivement plus d'apaisement. Nous pouvons explorer vos émotions, vos besoins, vos envies, votre rapport à vous-même et les différentes parts de vous qui peuvent parfois vous tirer dans des directions différentes."
+      },
+      {
+        "label": "",
+        "title": "Des outils adaptés à vous",
+        "texte": "Selon ce qui vous convient, nous pouvons également utiliser des outils issus de la psychosynthèse, comme la visualisation, l'écriture ou le dessin. Au fil de l'accompagnement, vous pouvez mieux comprendre vos fonctionnements, retrouver davantage de clarté dans vos choix et avancer vers une vie davantage en accord avec vous-même."
+      }
+    ]
+  },
+  "about": {
+    "label": "",
+    "title": "Qui est Anouck ?",
+    "texte": [
+      "Anouck Martin est *psychopraticienne*, diplômée en soins infirmiers et formée à la psychosynthèse au terme de quatre années de formation.",
+      "Son parcours dans le domaine du soin lui a permis de développer une expérience importante de l'écoute et de l'accompagnement des personnes dans des périodes de difficulté ou de changement.",
+      "Elle exerce aujourd'hui en cabinet et accompagne principalement des *femmes* qui traversent une période de stress, d'angoisse, de fatigue, de questionnement ou de difficulté dans leurs relations.",
+      "Son approche repose sur une *écoute attentive et sans jugement*, dans laquelle chaque personne peut prendre le temps de mieux comprendre ce qu'elle vit, ses émotions, ses besoins et ses envies.",
+      "Anouck accorde une importance particulière au *respect du rythme et des choix* de chaque personne. Elle accompagne chacune dans son cheminement, sans imposer de direction.",
+      "Elle est membre de la *Société Française de Psychosynthèse Thérapeutique (SFPT)*, association professionnelle reconnue par la *Fédération Française de Psychothérapie et Psychanalyse (FF2P)*. Elle est régulièrement supervisée dans sa pratique et poursuit une démarche de formation continue.",
+      "Elle poursuit actuellement un *DU d'art-thérapie à Toulouse*, qu'elle validera en juin 2027.",
+      "Anouck est également *professionnelle partenaire* du réseau *Endonnétte*, qui rassemble des professionnels engagés pour le bien-être et l'accompagnement des femmes."
+    ],
+    "formation": [
+      { "label": "🎓", "title": "", "texte": "Diplôme d'État infirmier" },
+      { "label": "🌀", "title": "", "texte": "4 années de formation en psychosynthèse" },
+      { "label": "🤝", "title": "", "texte": "Membre de la SFPT" },
+      { "label": "🧭", "title": "", "texte": "Supervision régulière" },
+      { "label": "📚", "title": "", "texte": "Formation continue" },
+      { "label": "🎨", "title": "", "texte": "DU d'art-thérapie — Toulouse — _en cours_" }
+    ]
+  },
+  "approach": {
+    "label": "",
+    "title": "Mon approche thérapeutique",
+    "texte": "Une approche globale qui considère la personne dans sa globalité — corps, émotions, pensées — et lui permet de retrouver sa liberté de choix.",
+    "cards": [
+      {
+        "label": "",
+        "title": "La Psychosynthèse",
+        "texte": [
+          "La psychosynthèse est une approche de psychothérapie qui considère la personne dans sa globalité.",
+          "Elle permet d'explorer ce que vous vivez aujourd'hui, tout en portant attention à vos émotions, vos pensées, vos besoins, vos envies et aux différentes parts de vous qui peuvent parfois entrer en tension.",
+          "L'objectif n'est pas seulement de faire disparaître ce qui vous fait souffrir, mais aussi de mieux comprendre votre fonctionnement et de vous reconnecter à ce qui est important pour vous.",
+          "Cette approche peut notamment vous aider à prendre du recul, à mieux vous connaître et à retrouver davantage de liberté dans vos choix.",
+          "La psychosynthèse fait partie des méthodes de psychothérapie reconnues par la *Fédération Française de Psychothérapie et Psychanalyse (FF2P)*."
+        ]
+      },
+      {
+        "label": "",
+        "title": "L'Art-Thérapie & les médiateurs créatifs",
+        "texte": [
+          "Pour enrichir le dialogue, j'intègre des médiateurs créatifs issus de la psychosynthèse : dessin, écriture, visualisation ou mouvement corporel.",
+          "Ces supports symboliques permettent d'exprimer des émotions parfois difficiles à verbaliser, d'accéder à l'inconscient en douceur et d'ouvrir de nouvelles perspectives d'évolution, sans aucune recherche de performance."
+        ]
+      },
+      {
+        "label": "",
+        "title": "Comment se déroule un accompagnement ?",
+        "texte": [
+          "La *première séance* est un temps pour faire connaissance et prendre le temps de comprendre ce qui vous amène. Vous pouvez simplement raconter ce que vous vivez aujourd'hui, même si tout vous semble confus ou difficile à mettre en mots.",
+          "Au fil des séances, nous avançons ensemble en fonction de vos besoins et de ce qui émerge dans votre parcours. Certaines séances s'appuient principalement sur la parole. D'autres peuvent intégrer des propositions de visualisation, d'écriture, de dessin ou d'autres outils issus de la psychosynthèse.",
+          "Le rythme des séances est adapté à chaque personne et peut évoluer au cours de l'accompagnement."
+        ]
+      }
+    ]
+  },
+  "services": {
+    "label": "",
+    "title": "Prestations",
+    "texte": "Séances individuelles, en cabinet ou en visioconférence. Le rythme des rendez-vous est défini ensemble et peut évoluer au fil de l'accompagnement.",
+    "facts": [
+      { "label": "Séance individuelle", "texte": "60 €" },
+      { "label": "Durée", "texte": "1 heure" },
+      { "label": "Lieu", "texte": "En cabinet ou en ligne" }
+    ],
+    "offer": {
+      "label": "🌿",
+      "title": "Un accompagnement global, adapté à vous",
+      "texte": [
+        "Chaque accompagnement est unique et évolue à votre rythme. Les séances individuelles (1 heure) s'appuient sur une écoute attentive et un dialogue face à face, et peuvent être enrichies, selon ce qui vous convient, par des médiateurs créatifs issus de la psychosynthèse : dessin, écriture ou visualisation.",
+        "Ce suivi global vous accompagne pour traverser les épreuves, apaiser les angoisses, gérer le stress et retrouver un équilibre intérieur — que ce soit au cabinet (Laroin ou Lasseube) ou en visioconférence."
+      ]
+    }
+  },
+  "cabinets": {
+    "label": "",
+    "title": "Cabinets de consultation",
+    "texte": "Deux lieux de consultation accueillants au cœur du Béarn, facilement accessibles.",
+    "cards": [
+      {
+        "label": "Cabinet Laroin",
+        "title": "Laroin",
+        "texte": "27 rue principale, 64110 Laroin",
+        "days": "Jeudi & vendredi"
+      },
+      {
+        "label": "Cabinet Lasseube",
+        "title": "Lasseube",
+        "texte": "Chemin Clergat, 64290 Lasseube",
+        "days": "Lundi, mardi & mercredi"
+      }
+    ]
+  },
+  "contact": {
+    "label": "",
+    "title": "Me contacter",
+    "texte": "N'hésitez pas à me joindre pour planifier une séance ou échanger sur votre démarche."
+  }
+}
