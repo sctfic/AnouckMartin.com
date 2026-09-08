@@ -174,6 +174,7 @@ function getCustomIcon() {
    ============================================================ */
 
 const CONTENT_URL = 'content.json';
+var AM_STATE = null;
 
 async function initContent() {
   // Aucun texte par défaut : on place d'abord « … » partout,
@@ -190,15 +191,11 @@ async function initContent() {
     return;
   }
 
-  renderHero(data.hero);
-  renderIntro(data.intro);
-  renderSituations(data.situations);
-  renderRessenti(data.ressenti);
-  renderAbout(data.about);
-  renderApproach(data.approach);
-  renderServices(data.services);
-  renderCabinets(data.cabinets);
-  renderContact(data.contact);
+  AM_STATE = data;
+  renderAllContent(data);
+  if (typeof window.__onContentApplied === 'function') {
+    try { window.__onContentApplied(); } catch (e) { console.warn(e); }
+  }
 }
 
 /* --- Petits helpers --- */
@@ -250,7 +247,7 @@ function showPlaceholders() {
   blank(qa('#about .about__text h2, #about .about__text > p'));
   qa('#about .formation__list li').forEach(function (li) {
     const icon = q('.formation__icon', li);
-    li.innerHTML = (icon ? icon.outerHTML : '') + '...';
+    li.innerHTML = (icon ? icon.outerHTML : '') + '<span class="formation__value">...</span>';
   });
   // Approche
   blank(qa('#approach .section__title, #approach .section__subtitle'));
@@ -357,7 +354,8 @@ function renderAbout(b) {
   (b.formation || []).forEach(function (f, i) {
     const li = lis[i];
     if (!li) return;
-    li.innerHTML = '<span class="formation__icon" aria-hidden="true">' + rich(f.label) + '</span>' + rich(f.texte);
+    li.innerHTML = '<span class="formation__icon" aria-hidden="true">' + rich(f.label) + '</span>' +
+      '<span class="formation__value">' + rich(f.texte) + '</span>';
   });
 }
 
@@ -432,6 +430,34 @@ function renderContact(b) {
   fill(q('#contact .section__title'), b.title);
   fill(q('#contact .section__subtitle'), b.texte);
 }
+
+/* --- Application globale du contenu + pont pour le module admin --- */
+function renderAllContent(d) {
+  renderHero(d.hero);
+  renderIntro(d.intro);
+  renderSituations(d.situations);
+  renderRessenti(d.ressenti);
+  renderAbout(d.about);
+  renderApproach(d.approach);
+  renderServices(d.services);
+  renderCabinets(d.cabinets);
+  renderContact(d.contact);
+}
+
+function AM_apply(data) {
+  if (!data) return;
+  AM_STATE = data;
+  renderAllContent(data);
+  if (typeof window.__onContentApplied === 'function') {
+    try { window.__onContentApplied(); } catch (e) { console.warn(e); }
+  }
+}
+
+window.AM = {
+  get: function () { return AM_STATE; },
+  apply: AM_apply,
+  md: function (t) { return rich(t); }
+};
 
 /* --- WhatsApp deep link (Android intent:// + fallback) --- */
 function openWhatsApp() {
