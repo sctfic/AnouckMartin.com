@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="fr-FR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anouck Martin — Psychopraticienne | Laroin &amp; Lasseube (64)</title>
+  <meta name="description"
+    content="Anouck Martin, psychopraticienne en psychosynthèse et art-thérapie, accompagne les femmes à Laroin et Lasseube (64). Séances individuelles en cabinet et en ligne, avec douceur et sans jugement.">
+  <meta name="keywords"
+    content="psychopraticienne, psychosynthèse, art-thérapie, accompagnement des femmes, stress, angoisse, fatigue, psychothérapie, Laroin, Lasseube, Pau, Pyrénées-Atlantiques">
+  <meta property="og:title" content="Anouck Martin — Psychopraticienne en Psychosynthèse">
+  <meta property="og:description"
+    content="Cabinet de psychothérapie et art-thérapie. Cabinets à Laroin et Lasseube (64). Accompagnement individuel et séances en ligne.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://anouckmartin.com">
+  <link rel="canonical" href="https://anouckmartin.com">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- Mobile nav overlay -->
+  <div class="nav-overlay" id="nav-overlay"></div>
+
+  <!-- ===================== HEADER ===================== -->
+  <header class="header" id="header">
+    <div class="container">
+      <a href="#" class="header__logo">Anouck <span>Martin</span></a>
+
+      <div class="header__actions">
+        <button class="header__burger" id="burger" aria-label="Menu de navigation">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+
+      <nav>
+        <ul class="header__nav" id="main-nav">
+          <li><a href="#about">Qui suis-je</a></li>
+          <li><a href="#approach">Mon approche</a></li>
+          <li><a href="#services">Prestations</a></li>
+          <li><a href="#cabinets">Cabinets</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ===================== HERO ===================== -->
+  <section class="hero" id="hero">
+    <div class="hero__bg"></div>
+    <div class="hero__overlay"></div>
+
+    <div class="hero__content">
+      <div class="hero__badge">...</div>
+      <h1 class="hero__name">...</h1>
+      <p class="hero__title">...</p>
+      <a href="#contact" class="hero__cta">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path
+            d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
+        </svg>
+        Prendre rendez-vous
+      </a>
+    </div>
+
+    <div class="hero__scroll">
+      <span>Découvrir</span>
+      <div class="hero__scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- ===================== PRENDRE LE TEMPS DE VOUS ÉCOUTER ===================== -->
+  <section class="section" id="intro">
+    <div class="container">
+      <div class="intro fade-in">
+        <span class="intro__kicker">...</span>
+        <h2 class="section__title">...</h2>
+        <p class="intro__lead">...</p>
+        <p class="intro__text">...</p>
+        <p class="intro__text">...</p>
+        <a href="#contact" class="btn-cta">Prendre contact</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== QUAND CONSULTER ? ===================== -->
+  <section class="section section--alt" id="situations">
+    <div class="container">
+      <h2 class="section__title fade-in">...</h2>
+      <p class="section__subtitle fade-in">...</p>
+
+      <div class="services__grid stagger">
+        <article class="service-card fade-in">
+          <div class="service-card__icon">🧭</div>
+          <h3 class="service-card__title">...</h3>
+          <p class="service-card__desc">...</p>
+        </article>
+
+        <article class="service-card fade-in">
+          <div class="service-card__icon">🕯️</div>
+          <h3 class="service-card__title">...</h3>
+          <p class="service-card__desc">...</p>
+        </article>
+
+        <article class="service-card fade-in">
+          <div class="service-card__icon">💬</div>
+          <h3 class="service-card__title">...</h3>
+          <p class="service-card__desc">...</p>
+        </article>
+      </div>
+
+      <div class="note-band fade-in">
+        <p>...</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== QUAND LES ÉMOTIONS DÉBORDENT ===================== -->
+  <section class="section" id="ressenti">
+    <div class="container">
+      <h2 class="section__title fade-in">...</h2>
+      <p class="section__subtitle fade-in">...</p>
+
+      <div class="approach__grid stagger">
+        <div class="approach__card fade-in">
+          <h3>...</h3>
+          <p>...</p>
+        </div>
+
+        <div class="approach__card fade-in">
+          <h3>...</h3>
+          <p>...</p>
+        </div>
+
+        <div class="approach__card fade-in">
+          <h3>...</h3>
+          <p>...</p>
+        </div>
+
+        <div class="approach__card fade-in">
+          <h3>...</h3>
+          <p>...</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== QUI EST ANOUCK ? ===================== -->
+  <section class="section section--alt" id="about">
+    <div class="container">
+      <div class="about__grid">
+        <div class="about__visual fade-in-left">
+          <div class="about__image-wrapper">
+            <img src="photo-anouck.jpeg"
+              alt="Portrait d'Anouck Martin, psychopraticienne en psychosynthèse et art-thérapie à Laroin et Lasseube"
+              class="about__image">
+          </div>
+          <aside class="formation" aria-label="Formation et pratique d'Anouck Martin">
+            <h3 class="formation__title">Formation &amp; Pratique</h3>
+            <ul class="formation__list">
+              <li class="formation__item"><span class="formation__icon" aria-hidden="true">🎓</span>...</li>
+              <li class="formation__item"><span class="formation__icon" aria-hidden="true">🌀</span>...</li>
+              <li class="formation__item"><span class="formation__icon" aria-hidden="true">🤝</span>...</li>
+              <li class="formation__item"><span class="formation__icon" aria-hidden="true">🧭</span>...</li>
+              <li class="formation__item"><span class="formation__icon" aria-hidden="true">📚</span>...</li>
+              <li class="formation__item"><span class="formation__icon" aria-hidden="true">🎨</span>...</li>
+            </ul>
+          </aside>
+        </div>
+
+        <div class="about__text fade-in-right">
+          <h2>...</h2>
+          <p>...</p>
+          <p>...</p>
+          <p>...</p>
+          <p>...</p>
+          <p>...</p>
+          <p>...</p>
+          <p>...</p>
+          <p>...</p>
+
+          <div class="about__links">
+            <a href="https://www.sfpt-psychosynthese.fr/" target="_blank" rel="noopener noreferrer" class="sfpt-link">
+              Découvrir la SFPT
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </a>
+            <a href="https://endonenette.com/" target="_blank" rel="noopener noreferrer" class="sfpt-link">
+              Découvrir Endonenette
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </a>
+          </div>
+
+          <div class="about__tags">
+            <span class="about__tag">Écoute sans jugement</span>
+            <span class="about__tag">Respect de votre rythme</span>
+            <span class="about__tag">Accompagnement des femmes</span>
+            <span class="about__tag">Psychosynthèse</span>
+            <span class="about__tag">SFPT · FF2P</span>
+            <span class="about__tag">Partenaire Endonenette</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== MON APPROCHE ===================== -->
+  <section class="section" id="approach">
+    <div class="container">
+      <h2 class="section__title fade-in">...</h2>
+      <p class="section__subtitle fade-in">...</p>
+
+      <div class="approach__grid stagger">
+        <div class="approach__card fade-in">
+          <h3>...</h3>
+          <p>...</p>
+          <p>...</p>
+          <p>...</p>
+          <p>...</p>
+          <p>...</p>
+        </div>
+
+        <div class="approach__card fade-in">
+          <h3>...</h3>
+          <p>...</p>
+          <p>...</p>
+        </div>
+
+        <div class="approach__card approach__card--wide fade-in">
+          <h3>...</h3>
+          <div class="approach__prose">
+            <p>...</p>
+            <p>...</p>
+            <p>...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== PRESTATIONS ===================== -->
+  <section class="section section--alt" id="services">
+    <div class="container">
+      <h2 class="section__title fade-in">...</h2>
+      <p class="section__subtitle fade-in">...</p>
+
+      <div class="practice-strip fade-in">
+        <div class="practice-strip__item">
+          <span class="practice-strip__label">...</span>
+          <span class="practice-strip__value">...</span>
+        </div>
+        <div class="practice-strip__item">
+          <span class="practice-strip__label">...</span>
+          <span class="practice-strip__value">...</span>
+        </div>
+        <div class="practice-strip__item">
+          <span class="practice-strip__label">...</span>
+          <span class="practice-strip__value">...</span>
+        </div>
+      </div>
+
+      <div class="services__grid stagger">
+        <article class="service-card service-card--global fade-in" id="service-global">
+          <div class="service-card__icon">🌿</div>
+          <h3 class="service-card__title">...</h3>
+          <p class="service-card__desc">...</p>
+          <p class="service-card__desc">...</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CABINETS ===================== -->
+  <section class="section" id="cabinets">
+    <div class="container">
+      <h2 class="section__title fade-in">...</h2>
+      <p class="section__subtitle fade-in">...</p>
+
+      <div class="cabinets__grid">
+        <!-- Cabinet Laroin -->
+        <div class="cabinet-card fade-in-left" id="cabinet-laroin">
+          <div class="cabinet-card__map" id="map-laroin"></div>
+          <div class="cabinet-card__info">
+            <span class="cabinet-card__label">...</span>
+            <h3 class="cabinet-card__name">...</h3>
+            <p class="cabinet-card__address">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+              <span class="cabinet-card__address-text">...</span>
+            </p>
+            <span class="cabinet-card__days">...</span>
+            <a href="https://www.google.com/maps/search/27+rue+principale+64110+Laroin" target="_blank"
+              rel="noopener noreferrer" class="cabinet-card__directions">
+              Itinéraire
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Cabinet Lasseube -->
+        <div class="cabinet-card fade-in-right" id="cabinet-lasseube">
+          <div class="cabinet-card__map" id="map-lasseube"></div>
+          <div class="cabinet-card__info">
+            <span class="cabinet-card__label">...</span>
+            <h3 class="cabinet-card__name">...</h3>
+            <p class="cabinet-card__address">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+              <span class="cabinet-card__address-text">...</span>
+            </p>
+            <span class="cabinet-card__days">...</span>
+            <a href="https://www.google.com/maps/place/43%C2%B013'10.6%22N+0%C2%B027'13.6%22W/" target="_blank"
+              rel="noopener noreferrer" class="cabinet-card__directions">
+              Itinéraire
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Communes avoisinantes -->
+      <div class="communes fade-in">
+        <h3 class="communes__title">Proximité géographique &amp; Communes avoisinantes</h3>
+        <div class="communes__grid">
+          <!-- Autour de Laroin -->
+          <div class="communes__group">
+            <h4 class="communes__group-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+              Autour de Laroin (Agglomération Paloise)
+            </h4>
+            <div class="communes__list">
+              <span class="communes__item">Pau</span>
+              <span class="communes__item">Billère</span>
+              <span class="communes__item">Lons</span>
+              <span class="communes__item">Lescar</span>
+              <span class="communes__item">Jurançon</span>
+              <span class="communes__item">Gelos</span>
+              <span class="communes__item">Bizanos</span>
+              <span class="communes__item">Idron</span>
+              <span class="communes__item">Artiguelouve</span>
+              <span class="communes__item">Saint-Faust</span>
+              <span class="communes__item">Gan</span>
+              <span class="communes__item">Mazères-Lezons</span>
+              <span class="communes__item">Uzos</span>
+            </div>
+          </div>
+
+          <!-- Autour de Lasseube -->
+          <div class="communes__group">
+            <h4 class="communes__group-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+              Autour de Lasseube (Haut-Béarn)
+            </h4>
+            <div class="communes__list">
+              <span class="communes__item">Oloron-Sainte-Marie</span>
+              <span class="communes__item">Gan</span>
+              <span class="communes__item">Monein</span>
+              <span class="communes__item">Ogeu-les-Bains</span>
+              <span class="communes__item">Lasseubetat</span>
+              <span class="communes__item">Escou</span>
+              <span class="communes__item">Estialescq</span>
+              <span class="communes__item">Bosdarros</span>
+              <span class="communes__item">Arudy</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CONTACT ===================== -->
+  <section class="section section--dark" id="contact">
+    <div class="container">
+      <h2 class="section__title fade-in">...</h2>
+      <p class="section__subtitle fade-in">...</p>
+
+      <div class="contact__grid stagger">
+        <!-- Téléphone -->
+        <div class="contact-card fade-in" id="contact-phone" onclick="window.location.href='tel:+33648000045'">
+          <div class="contact-card__icon">📞</div>
+          <div class="contact-card__label">Téléphone</div>
+          <div class="contact-card__value">
+            <a href="tel:+33648000045">06 48 00 00 45</a>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="contact-card fade-in" id="contact-email" onclick="window.location.href='mailto:anouckmartin.coach@gmail.com'">
+          <div class="contact-card__icon">
+            <img src="contact-email.png" alt="Email" class="contact-card__email-icon">
+          </div>
+          <div class="contact-card__label">Email</div>
+          <div class="contact-card__value">
+            <a href="mailto:anouckmartin.coach@gmail.com">anouckmartin.coach@gmail.com</a>
+          </div>
+        </div>
+
+        <!-- WhatsApp -->
+        <div class="contact-card fade-in" id="contact-whatsapp" onclick="openWhatsApp()">
+          <div class="contact-card__icon">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/4/4c/WhatsApp_Logo_green.svg" alt="WhatsApp"
+              class="contact-card__whatsapp-icon">
+          </div>
+          <div class="contact-card__label">WhatsApp</div>
+          <div class="contact-card__value">
+            <a href="https://api.whatsapp.com/send?phone=33648000045&text=Bonjour%2C%20je%20souhaiterais%20prendre%20rendez-vous%20pour%20une%20s%C3%A9ance%20d%27accompagnement%2C%20seriez%20vous%20disponible%20prochainement%20%3F"
+              target="_blank" rel="noopener noreferrer">Envoyer un message</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="footer">
+    <div class="container">
+      <p class="footer__copy">&copy; 2026 Anouck Martin — Psychopraticienne en Psychosynthèse &amp; Art-Thérapie</p>
+      <ul class="footer__links">
+        <li><a href="#hero">Haut de page</a></li>
+        <li><a href="mentions-legales.html">Mentions légales</a></li>
+      </ul>
+    </div>
+  </footer>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <!-- Site JS -->
+  <script src="script.js"></script>
+
+</body>
+
+</html>
