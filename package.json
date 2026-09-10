@@ -1,0 +1,21 @@
+{
+  "name": "anouckmartin",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Site vitrine d'Anouck Martin — psychopraticienne (Laroin & Lasseube, 64). Serveur Node pour le contenu éditable.",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "pm2:start": "pm2 start ecosystem.config.js --env production",
+    "pm2:reload": "pm2 reload anouckmartin",
+    "pm2:stop": "pm2 stop anouckmartin",
+    "pm2:logs": "pm2 logs anouckmartin",
+    "pm2:save": "pm2 save"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "UNLICENSED"
+}

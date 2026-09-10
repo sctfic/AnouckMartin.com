@@ -93,8 +93,37 @@ location /backups/ { deny all; }
 
 1. Copier les fichiers sur le serveur (ex. `/home/alban/www/anouckmartin.psy`).
 2. Vérifier la configuration : `nginx -t` puis `nginx -s reload`.
-3. Lancer `server.js` en permanence (pm2 ou systemd), avec accès en **écriture** au dossier.
-4. Définir `ROOT` si le site n'est pas dans le dossier du script.
+3. Lancer le service en permanence avec **PM2** (voir ci-dessous), avec accès en **écriture** au dossier.
+4. Définir `ROOT` si le site n'est pas dans le dossier du script (`ecosystem.config.js` le renseigne déjà).
+
+### Première installation PM2
+
+```bash
+# 1) Installer PM2 (une seule fois)
+npm install -g pm2
+
+# 2) Depuis le dossier du site : démarrer l'application
+pm2 start ecosystem.config.js --env production
+
+# 3) Enregistrer la liste des processus
+pm2 save
+
+# 4) Démarrage automatique au boot (exécuter la commande affichée)
+pm2 startup
+```
+
+Commandes utiles :
+
+```bash
+pm2 status                  # état du process
+pm2 logs anouckmartin       # journaux en direct
+pm2 reload anouckmartin     # rechargement après mise à jour
+pm2 restart anouckmartin    # redémarrage
+pm2 stop anouckmartin       # arrêt
+pm2 delete anouckmartin     # suppression du process
+```
+
+> **Surveillance des fichiers** : `watch` est activé dans `ecosystem.config.js` ; PM2 redémarre automatiquement l'application à chaque **upload de nouvelles versions du code**. Les fichiers de données (`content.json`, `admin.json`, `backups/`, `logs`) sont **ignorés** pour ne pas redémarrer lors des sauvegardes effectuées depuis l'espace admin.
 
 ## Sécurité
 

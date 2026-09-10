@@ -294,58 +294,57 @@
       <h2 class="section__title fade-in">...</h2>
       <p class="section__subtitle fade-in">...</p>
 
-      <div class="cabinets__grid">
-        <!-- Cabinet Laroin -->
-        <div class="cabinet-card fade-in-left" id="cabinet-laroin">
-          <div class="cabinet-card__map" id="map-laroin"></div>
-          <div class="cabinet-card__info">
-            <span class="cabinet-card__label">...</span>
-            <h3 class="cabinet-card__name">...</h3>
-            <p class="cabinet-card__address">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                <circle cx="12" cy="10" r="3" />
-              </svg>
-              <span class="cabinet-card__address-text">...</span>
-            </p>
-            <span class="cabinet-card__days">...</span>
-            <a href="https://www.google.com/maps/search/27+rue+principale+64110+Laroin" target="_blank"
-              rel="noopener noreferrer" class="cabinet-card__directions">
-              Itinéraire
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <line x1="5" y1="12" x2="19" y2="12" />
-                <polyline points="12 5 19 12 12 19" />
-              </svg>
-            </a>
-          </div>
-        </div>
+      <div class="cabinet-card cabinet-card--wide fade-in" id="cabinet-card">
+        <div class="cabinet-card__map cabinet-card__map--wide" id="map-cabinets"></div>
+        <div class="cabinet-card__info">
+          <div class="cabinets__grid">
+            <!-- Cabinet Laroin -->
+            <div class="cabinet-block" id="cabinet-laroin">
+              <span class="cabinet-card__label">...</span>
+              <h3 class="cabinet-card__name">...</h3>
+              <p class="cabinet-card__address">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg>
+                <span class="cabinet-card__address-text">...</span>
+              </p>
+              <span class="cabinet-card__days">...</span>
+              <a href="https://www.google.com/maps/search/27+rue+principale+64110+Laroin" target="_blank"
+                rel="noopener noreferrer" class="cabinet-card__directions">
+                Itinéraire
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                  <polyline points="12 5 19 12 12 19" />
+                </svg>
+              </a>
+            </div>
 
-        <!-- Cabinet Lasseube -->
-        <div class="cabinet-card fade-in-right" id="cabinet-lasseube">
-          <div class="cabinet-card__map" id="map-lasseube"></div>
-          <div class="cabinet-card__info">
-            <span class="cabinet-card__label">...</span>
-            <h3 class="cabinet-card__name">...</h3>
-            <p class="cabinet-card__address">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                <circle cx="12" cy="10" r="3" />
-              </svg>
-              <span class="cabinet-card__address-text">...</span>
-            </p>
-            <span class="cabinet-card__days">...</span>
-            <a href="https://www.google.com/maps/place/43%C2%B013'10.6%22N+0%C2%B027'13.6%22W/" target="_blank"
-              rel="noopener noreferrer" class="cabinet-card__directions">
-              Itinéraire
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <line x1="5" y1="12" x2="19" y2="12" />
-                <polyline points="12 5 19 12 12 19" />
-              </svg>
-            </a>
+            <!-- Cabinet Lasseube -->
+            <div class="cabinet-block" id="cabinet-lasseube">
+              <span class="cabinet-card__label">...</span>
+              <h3 class="cabinet-card__name">...</h3>
+              <p class="cabinet-card__address">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg>
+                <span class="cabinet-card__address-text">...</span>
+              </p>
+              <span class="cabinet-card__days">...</span>
+              <a href="https://www.google.com/maps/place/43%C2%B013'10.6%22N+0%C2%B027'13.6%22W/" target="_blank"
+                rel="noopener noreferrer" class="cabinet-card__directions">
+                Itinéraire
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12" />
+                  <polyline points="12 5 19 12 12 19" />
+                </svg>
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -353,9 +352,8 @@
       <!-- Communes avoisinantes -->
       <div class="communes fade-in">
         <h3 class="communes__title">Proximité géographique &amp; Communes avoisinantes</h3>
-        <div class="communes__grid">
-          <!-- Autour de Laroin -->
-          <div class="communes__group">
+        <div class="communes__group">
+          <div class="communes__block">
             <h4 class="communes__group-title">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                 stroke-linecap="round" stroke-linejoin="round">
@@ -381,8 +379,7 @@
             </div>
           </div>
 
-          <!-- Autour de Lasseube -->
-          <div class="communes__group">
+          <div class="communes__block">
             <h4 class="communes__group-title">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                 stroke-linecap="round" stroke-linejoin="round">

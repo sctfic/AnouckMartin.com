@@ -97,54 +97,49 @@ function initSmoothScroll() {
   });
 }
 
-/* --- Leaflet Maps (OpenStreetMap) --- */
+/* --- Carte Leaflet (OpenStreetMap) — les 2 cabinets sur une carte --- */
 function initMaps() {
   if (typeof L === 'undefined') {
     console.warn('Leaflet not loaded — maps disabled');
     return;
   }
 
-  // Cabinet Laroin — 27 rue principale, 64110 Laroin
-  const mapLaroinEl = document.getElementById('map-laroin');
-  if (mapLaroinEl) {
-    const coordsLaroin = [43.3048255, -0.44374];
-    const map1 = L.map('map-laroin', {
-      scrollWheelZoom: false,
-    }).setView(coordsLaroin, 14);
+  const mapEl = document.getElementById('map-cabinets');
+  if (!mapEl) return;
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-      maxZoom: 18,
-    }).addTo(map1);
+  // Cabinets + villes repères (Pau et Oloron-Sainte-Marie doivent être visibles)
+  const points = {
+    laroin: [43.3048255, -0.44374],
+    lasseube: [43.2193501, -0.453609],
+    pau: [43.2951, -0.3708],
+    oloron: [43.1944, -0.6067]
+  };
 
-    L.marker(coordsLaroin, { icon: getCustomIcon() })
-      .addTo(map1)
-      .bindPopup(
-        '<strong>Cabinet de Laroin</strong><br>27 rue principale<br>64110 Laroin'
-      )
-      .openPopup();
-  }
+  const map = L.map('map-cabinets', {
+    scrollWheelZoom: false,
+  });
 
-  // Cabinet Lasseube — Chemin Clergat, 64290 Lasseube
-  const mapLasseubeEl = document.getElementById('map-lasseube');
-  if (mapLasseubeEl) {
-    const coordsLasseube = [43.2193501, -0.453609];
-    const map2 = L.map('map-lasseube', {
-      scrollWheelZoom: false,
-    }).setView(coordsLasseube, 14);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    maxZoom: 18,
+  }).addTo(map);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-      maxZoom: 18,
-    }).addTo(map2);
+  // Les 2 cabinets
+  L.marker(points.laroin, { icon: getCustomIcon() })
+    .addTo(map)
+    .bindPopup('<strong>Cabinet de Laroin</strong><br>27 rue principale<br>64110 Laroin');
 
-    L.marker(coordsLasseube, { icon: getCustomIcon() })
-      .addTo(map2)
-      .bindPopup(
-        '<strong>Cabinet de Lasseube</strong><br>Chemin Clergat<br>64290 Lasseube'
-      )
-      .openPopup();
-  }
+  L.marker(points.lasseube, { icon: getCustomIcon() })
+    .addTo(map)
+    .bindPopup('<strong>Cabinet de Lasseube</strong><br>Chemin Clergat<br>64290 Lasseube');
+
+  // Villes repères (points discrets)
+  const cityStyle = { radius: 5, color: '#1d2440', fillColor: '#1d2440', fillOpacity: 0.55, weight: 1 };
+  L.circleMarker(points.pau, cityStyle).addTo(map).bindTooltip('Pau');
+  L.circleMarker(points.oloron, cityStyle).addTo(map).bindTooltip('Oloron-Sainte-Marie');
+
+  // Vue englobant Laroin, Lasseube, Pau et Oloron-Sainte-Marie
+  map.fitBounds([points.laroin, points.lasseube, points.pau, points.oloron], { padding: [40, 40] });
 }
 
 /* Marqueur personnalisé — couleurs du thème Joyeux */
@@ -263,7 +258,7 @@ function showPlaceholders() {
   if (offer) blank(qa('.service-card__title, .service-card__desc', offer));
   // Cabinets
   blank(qa('#cabinets .section__title, #cabinets .section__subtitle'));
-  qa('#cabinets .cabinet-card').forEach(function (card) {
+  qa('#cabinets .cabinet-block').forEach(function (card) {
     blank(qa('.cabinet-card__label, .cabinet-card__name, .cabinet-card__address-text, .cabinet-card__days', card));
   });
   // Contact
@@ -413,7 +408,7 @@ function renderCabinets(b) {
   if (!b) return;
   fill(q('#cabinets .section__title'), b.title);
   fill(q('#cabinets .section__subtitle'), b.texte);
-  const els = qa('#cabinets .cabinet-card');
+  const els = qa('#cabinets .cabinet-block');
   (b.cards || []).forEach(function (c, i) {
     const el = els[i];
     if (!el) return;

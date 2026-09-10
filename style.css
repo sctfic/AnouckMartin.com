@@ -1756,3 +1756,29 @@ textarea.am-editor {
     transform: translateX(-50%) translateY(0);
   }
 }
+
+/* ============================================================
+   CABINETS (carte unique) & COMMUNES (boîte unique)
+   ============================================================ */
+
+/* --- Une seule grande carte pour les 2 lieux --- */
+.cabinet-card--wide .cabinet-card__map--wide {
+  height: 420px;
+}
+
+.cabinet-card__info .cabinets__grid {
+  gap: var(--space-2xl);
+}
+
+/* --- Proximité géographique : une seule boîte --- */
+.communes__block + .communes__block {
+  margin-top: var(--space-xl);
+  padding-top: var(--space-xl);
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+@media (max-width: 768px) {
+  .cabinet-card__map--wide {
+    height: 300px;
+  }
+}

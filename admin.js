@@ -125,7 +125,7 @@
     // Cabinets
     tag(q('#cabinets .section__title'), 'cabinets.title');
     tag(q('#cabinets .section__subtitle'), 'cabinets.texte');
-    qa('#cabinets .cabinet-card').forEach(function (card, i) {
+    qa('#cabinets .cabinet-block').forEach(function (card, i) {
       tag(q('.cabinet-card__label', card), 'cabinets.cards.' + i + '.label');
       tag(q('.cabinet-card__name', card), 'cabinets.cards.' + i + '.title');
       tag(q('.cabinet-card__address-text', card), 'cabinets.cards.' + i + '.texte');
