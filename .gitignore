@@ -1,0 +1,6 @@
+/data/
+/admin.json
+/backups/
+node_modules/
+logs/
+*.log

@@ -12,8 +12,8 @@ module.exports = {
   apps: [
     {
       name: 'anouckmartin',
-      script: 'server.js',      // fichier lancé par PM2 (ne pas préfixer par « node »)
-      cwd: __dirname,           // dossier du site (où se trouvent index.html et content.json)
+      script: 'backend/server.js',
+      cwd: __dirname,           // racine du projet
       instances: 1,             // 1 seul process : écritures JSON séquentielles
       exec_mode: 'fork',
       watch: true,              // redémarre à chaque upload de nouvelles versions du code
@@ -22,9 +22,8 @@ module.exports = {
         'node_modules',
         '.git',
         'logs',
-        'backups',
-        'content.json',
-        'admin.json',
+        'data',
+        'frontend/content.json',
         '*.log'
       ],
       autorestart: true,
@@ -32,12 +31,14 @@ module.exports = {
       env: {
         NODE_ENV: 'development',
         PORT: 3210,
-        ROOT: __dirname
+        ROOT: require('path').join(__dirname, 'frontend'),
+        DATA_DIR: require('path').join(__dirname, 'data')
       },
       env_production: {
         NODE_ENV: 'production',
         PORT: 3210,
-        ROOT: __dirname
+        ROOT: require('path').join(__dirname, 'frontend'),
+        DATA_DIR: require('path').join(__dirname, 'data')
       }
     }
   ]

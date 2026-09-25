@@ -81,6 +81,7 @@
     ],
     "formation": [
       { "label": "🎓", "title": "", "texte": "Diplôme d'État infirmier" },
+      { "label": "🌿", "title": "", "texte": "Plus de 10 ans d'expérience dans la relation de soins et d'accompagnement" },
       { "label": "🌀", "title": "", "texte": "4 années de formation en psychosynthèse" },
       { "label": "🤝", "title": "", "texte": "Membre de la SFPT" },
       { "label": "🧭", "title": "", "texte": "Supervision régulière" },
@@ -125,7 +126,7 @@
   },
   "services": {
     "label": "",
-    "title": "Prestations",
+    "title": "Consultations",
     "texte": "Séances individuelles, en cabinet ou en visioconférence. Le rythme des rendez-vous est défini ensemble et peut évoluer au fil de l'accompagnement.",
     "facts": [
       { "label": "Séance individuelle", "texte": "60 €" },

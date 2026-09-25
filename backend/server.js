@@ -2,9 +2,10 @@
 /* ============================================================
    Anouck Martin — Serveur statique + API d'administration
    ------------------------------------------------------------
-   Démarrage :   node server.js            (port 3210)
+   Démarrage :   npm start                 (port 3210)
    Variables :
-     ROOT  = dossier du site (défaut : dossier du fichier)
+     ROOT  = dossier public (défaut : ../frontend)
+     DATA_DIR = dossier privé (défaut : ../data)
      PORT  = port d'écoute (défaut : 3210)
    L'API est disponible sous /api/ et gère :
      GET  /api/auth        -> { configured }
@@ -13,7 +14,7 @@
      GET  /api/me          -> authentification persistante (jeton 48 h)
      GET  /api/content     -> contenu actuel
      POST /api/content     -> { content } (jeton requis) + sauvegarde
-   Les sauvegardes sont écrites dans <ROOT>/backups/Content_AAAA-MM-JJ.json
+   Les sauvegardes sont écrites dans <DATA_DIR>/backups/Content_AAAA-MM-JJ.json
    ============================================================ */
 'use strict';
 
@@ -22,10 +23,11 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 
-const ROOT = path.resolve(process.env.ROOT || __dirname);
-const PORT = parseInt(process.env.PORT, 10) || 3210;
-const BACKUP_DIR = path.join(ROOT, 'backups');
-const ADMIN_FILE = path.join(ROOT, 'admin.json');
+const ROOT = path.resolve(process.env.ROOT || path.join(__dirname, '..', 'frontend'));
+const DATA_DIR = path.resolve(process.env.DATA_DIR || path.join(__dirname, '..', 'data'));
+const PORT = process.env.PORT === undefined ? 3210 : parseInt(process.env.PORT, 10);
+const BACKUP_DIR = path.join(DATA_DIR, 'backups');
+const ADMIN_FILE = path.join(DATA_DIR, 'admin.json');
 const CONTENT_FILE = path.join(ROOT, 'content.json');
 
 const SESSION_TTL_MS = 48 * 60 * 60 * 1000;      // session : 48 h
@@ -219,7 +221,10 @@ function serveStatic(req, res, urlPath) {
     res.writeHead(404); res.end(); return;
   }
   let filePath = path.normalize(path.join(ROOT, rel));
-  if (!filePath.startsWith(ROOT)) { res.writeHead(403); res.end(); return; }
+  const relativePath = path.relative(ROOT, filePath);
+  if (relativePath === '..' || relativePath.startsWith('..' + path.sep) || path.isAbsolute(relativePath)) {
+    res.writeHead(403); res.end(); return;
+  }
 
   if (!fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
     const index = path.join(filePath, 'index.html');
@@ -266,8 +271,9 @@ server.on('error', function (err) {
 });
 
 server.listen(PORT, function () {
+  const listeningPort = server.address().port;
   console.log('Serveur Anouck Martin démarré :');
-  console.log('  Site      -> http://localhost:' + PORT);
-  console.log('  API admin -> http://localhost:' + PORT + '/api/');
+  console.log('  Site      -> http://localhost:' + listeningPort);
+  console.log('  API admin -> http://localhost:' + listeningPort + '/api/');
   console.log('  Racine    -> ' + ROOT);
 });
