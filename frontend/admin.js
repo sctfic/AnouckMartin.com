@@ -24,6 +24,11 @@
   var updating = false;
   var updateTimer = null;
   var reloadAfterUpdate = false;
+  var displayedStep = -1;
+  var displayedAt = 0;
+  var refreshingUpdate = false;
+  var updateSteps = ['download', 'validate', 'install', 'restart', 'health', 'complete'];
+  function pauseStep(ms) { return new Promise(function (resolve) { setTimeout(resolve, ms); }); }
   var modalMode = 'login';
 
   function q(sel, root) { return (root || document).querySelector(sel); }
@@ -346,6 +351,15 @@
       else item.removeAttribute('aria-current');
     });
     q('#am-update-dialog').dataset.state = status.state || 'idle';
+    q('#am-download').hidden = status.stage !== 'download';
+    if (status.download) {
+      q('#am-download-progress').value = status.download.percent;
+      q('#am-download-label').textContent = status.download.percent + ' %' +
+        (status.download.total ? ' · ' + status.download.received + '/' + status.download.total + ' objets Git' : '');
+    } else {
+      q('#am-download-progress').removeAttribute('value');
+      q('#am-download-label').textContent = 'Connexion à GitHub…';
+    }
     q('#am-update-version').textContent = [
       status.release ? 'Version GitHub : ' + status.release.slice(0, 12) : '',
       status.previousRelease ? 'Version précédente : ' + status.previousRelease.slice(0, 12) : '',
@@ -364,6 +378,8 @@
   }
 
   async function refreshUpdateStatus() {
+    if (refreshingUpdate) return;
+    refreshingUpdate = true;
     clearTimeout(updateTimer);
     try {
       var response = await fetch(API + '/update', { cache: 'no-store', headers: { Authorization: 'Bearer ' + sessionToken() } });
@@ -371,22 +387,38 @@
       if (!response.ok) throw new Error('Vérification de la mise à jour indisponible.');
       var status = await response.json();
       if (!amEnabled) return;
-      renderUpdateStatus(status);
       if (status.busy && status.state !== 'failed') reloadAfterUpdate = true;
       if (status.state === 'failed') reloadAfterUpdate = false;
+      if (reloadAfterUpdate) {
+        var target = updateSteps.indexOf(status.stage);
+        while (displayedStep < target) {
+          await pauseStep(Math.max(0, 600 - (Date.now() - displayedAt)));
+          if (!amEnabled) return;
+          displayedStep++;
+          displayedAt = Date.now();
+          renderUpdateStatus(Object.assign({}, status, { busy: true, state: 'running',
+            stage: updateSteps[displayedStep], message: ['Téléchargement…', 'Vérification du code…',
+              'Installation…', 'Redémarrage…', 'Vérification du site…', 'Mise à jour terminée.'][displayedStep] }));
+        }
+      }
+      renderUpdateStatus(status);
       if (!status.busy && status.state === 'complete' && reloadAfterUpdate) {
+        updating = true;
+        q('#am-update').disabled = true;
+        await pauseStep(Math.max(0, 600 - (Date.now() - displayedAt)));
+        if (!amEnabled) return;
         reloadAfterUpdate = false;
         q('#am-update-status').textContent = 'Mise à jour réussie. Rechargement du site…';
         window.location.reload();
         return;
       }
-      if (status.busy && status.state !== 'failed') updateTimer = setTimeout(refreshUpdateStatus, 2000);
+      if (status.busy && status.state !== 'failed') updateTimer = setTimeout(refreshUpdateStatus, 400);
     } catch (error) {
       if (!amEnabled) return;
       q('#am-update-status').textContent = updating ? 'Redémarrage en cours… La vérification reprend automatiquement.' : error.message;
       q('#am-update').disabled = true;
       if (updating) updateTimer = setTimeout(refreshUpdateStatus, 3000);
-    }
+    } finally { refreshingUpdate = false; }
   }
 
   async function startUpdate() {
@@ -395,6 +427,8 @@
       return;
     }
     updating = true;
+    displayedStep = -1;
+    displayedAt = 0;
     q('#am-update').disabled = true;
     q('#am-update-status').textContent = 'Démarrage de la mise à jour…';
     try {
@@ -501,7 +535,7 @@
     form.style.display = 'block';
     q('#am-submit').textContent = mode === 'setup' ? 'Créer le mot de passe' : 'Se connecter';
     q('#am-msg').textContent = mode === 'setup'
-      ? 'Aucun mot de passe n’est encore défini. Le premier mot de passe saisi deviendra le mot de passe administrateur.'
+      ? 'Choisissez votre mot de passe administrateur.'
       : 'Entrez votre mot de passe administrateur.';
     q('#am-hint').textContent = 'La session reste active 48 heures.';
     var input = q('#am-pass');

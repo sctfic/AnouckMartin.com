@@ -23,7 +23,8 @@ module.exports = {
         'node_modules',
         '.git',
         'logs',
-        'data',
+        'backend/data',
+        'backups',
         'frontend/content.json',
         '*.log'
       ],
@@ -33,14 +34,14 @@ module.exports = {
         NODE_ENV: 'development',
         PORT: 3210,
         ROOT: require('path').join(__dirname, 'frontend'),
-        DATA_DIR: require('path').join(__dirname, 'data')
+        DATA_DIR: require('path').join(__dirname, 'backend', 'data')
       },
       env_production: {
         NODE_ENV: 'production',
         ENABLE_UPDATES: '1',
         PORT: 3210,
         ROOT: require('path').join(__dirname, 'frontend'),
-        DATA_DIR: require('path').join(__dirname, 'data')
+        DATA_DIR: require('path').join(__dirname, 'backend', 'data')
       }
     }
   ]

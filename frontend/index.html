@@ -486,9 +486,13 @@
   <dialog class="am-update-dialog" id="am-update-dialog" aria-labelledby="am-update-title">
     <button type="button" class="am-close" id="am-update-close" aria-label="Fermer la fenêtre de mise à jour">&times;</button>
     <h2 id="am-update-title">Mettre à jour le site</h2>
-    <p>Récupérer le frontend et le backend depuis la branche <strong>main</strong> de GitHub ?</p>
-    <p>Les textes, les fichiers JSON et les images seront conservés. L’édition sera suspendue pendant l’opération et le site pourra être brièvement indisponible au redémarrage.</p>
+    <p>Installer la dernière version GitHub ? Textes et images conservés.</p>
+    <p>Édition suspendue et brève coupure au redémarrage.</p>
     <p id="am-update-status" role="status" aria-live="polite">Vérification du serveur…</p>
+    <div id="am-download" hidden>
+      <progress id="am-download-progress" max="100" aria-label="Téléchargement du code"></progress>
+      <span id="am-download-label" aria-live="polite"></span>
+    </div>
     <ol class="am-update-steps" id="am-update-steps" aria-label="Étapes de la mise à jour" hidden>
       <li data-stage="download">Téléchargement</li>
       <li data-stage="validate">Vérification du code</li>
@@ -503,7 +507,7 @@
       <p id="am-update-rollback">Si le redémarrage échoue, une restauration de la version précédente est tentée automatiquement.</p>
       <p id="am-update-backup"></p>
       <p>Pour une restauration manuelle, demander à la personne qui gère le serveur d’arrêter PM2, de sauvegarder les JSON et images actuels, puis de consulter le fichier <code>transaction.json</code> du déploiement. Les anciens dossiers portent les noms <code>previous-frontend</code> et <code>previous-backend</code>.</p>
-      <p>Conserver les JSON actuels lors du retour au code précédent, ainsi que <code>data/uploads/</code>. Rétablir la version dans <code>data/release.json</code>, retirer le verrou <code>data/update.lock</code> seulement après vérification, puis relancer PM2.</p>
+      <p>Restaurer uniquement le code en conservant les JSON actuels et tout <code>backend/data/</code>. Rétablir <code>backend/data/release.json</code>, retirer <code>backend/data/update.lock</code> après vérification, puis relancer PM2.</p>
     </details>
     <div class="am-update-actions">
       <button type="button" class="am-submit" id="am-update" disabled>Appliquer maintenant</button>

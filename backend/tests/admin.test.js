@@ -22,16 +22,22 @@ async function adminFixture() {
   const session = new Map([['am_admin_session', JSON.stringify({ token: 'test', exp: Date.now() + 60000 })]]);
   const calls = [];
   let reloads = 0;
+  let now = Date.now();
+  const presented = [];
+  const steps = Array.from({ length: 6 }, (_, index) => ({ ...element(),
+    setAttribute(name) { if (name === 'aria-current') presented.push({ index, at: now }); },
+  }));
   let status = { enabled: true, busy: false, state: 'idle' };
   const context = {
     document: {
       readyState: 'complete', body: element(),
       querySelector: selector => elements.get(selector) || null,
-      querySelectorAll: () => [], createElement: element, addEventListener() {},
+      querySelectorAll: selector => selector === '#am-update-steps li' ? steps : [], createElement: element, addEventListener() {},
     },
     window: { location: { reload() { reloads++; } } },
     localStorage: { getItem: key => session.get(key), setItem: (key, value) => session.set(key, value), removeItem: key => session.delete(key) },
-    setTimeout() { return 1; }, clearTimeout() {},
+    Date: class extends Date { static now() { return now; } },
+    setTimeout(fn, ms) { if (ms <= 600 && ms !== 400) { now += ms; Promise.resolve().then(fn); } return 1; }, clearTimeout() {},
     fetch: async (url, options = {}) => {
       calls.push({ url, method: options.method || 'GET' });
       return { ok: true, status: 200, json: async () => url === '/api/me' ? { ok: true } : options.method === 'POST' ? { ok: true } : status };
@@ -41,7 +47,7 @@ async function adminFixture() {
   const flush = () => new Promise(resolve => setImmediate(resolve));
   await flush();
   return {
-    elements, session, calls, reloads: () => reloads,
+    elements, session, calls, presented, reloads: () => reloads,
     status(value) { status = value; },
     async click(id) { await elements.get('#' + id).handlers.click({ preventDefault() {} }); await flush(); },
   };
@@ -62,9 +68,13 @@ test('appliquer lance une mise à jour puis recharge après succès', async () =
   await f.click('admin-update-btn');
   assert.equal(f.reloads(), 0, 'Un ancien succès ne doit pas recharger la page');
   assert.equal(f.calls.some(call => call.method === 'POST'), false, 'Ouvrir la fenêtre ne lance pas de mise à jour');
+  f.presented.length = 0;
   await f.click('am-update');
   assert.equal(f.calls.filter(call => call.url === '/api/update' && call.method === 'POST').length, 1);
   assert.equal(f.reloads(), 1);
+  const firstSteps = f.presented.filter((step, i, all) => all.findIndex(other => other.index === step.index) === i);
+  assert.deepEqual(firstSteps.map(step => step.index), [0, 1, 2, 3, 4, 5]);
+  for (let i = 1; i < firstSteps.length; i++) assert.ok(firstSteps[i].at - firstSteps[i - 1].at >= 600);
 });
 
 test('échec de mise à jour : conserver le diagnostic sans recharger', async () => {

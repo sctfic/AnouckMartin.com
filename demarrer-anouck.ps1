@@ -83,7 +83,7 @@ if ($freshClone) {
 $excludeFile = & git.exe rev-parse --git-path info/exclude
 if ($LASTEXITCODE -ne 0) { throw 'Impossible de trouver les exclusions Git locales.' }
 $existingExcludes = @(Get-Content -LiteralPath $excludeFile -ErrorAction SilentlyContinue)
-foreach ($entry in @('/data/', '/admin.json', '/backups/', '/node_modules/', '/logs/')) {
+foreach ($entry in @('/data/', '/backend/data/', '/admin.json', '/backups/', '/node_modules/', '/logs/')) {
     if ($existingExcludes -notcontains $entry) {
         Add-Content -LiteralPath $excludeFile -Value "`n$entry"
     }

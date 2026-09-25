@@ -25,4 +25,28 @@ function imageExtension(bytes) {
   if (bytes.length > 20 && bytes.toString('ascii', 0, 4) === 'RIFF' && bytes.toString('ascii', 8, 12) === 'WEBP') return 'webp';
   throw new Error('Image invalide. Formats acceptés : JPEG, PNG ou WebP.');
 }
-module.exports = { atomicWrite, revision, imageExtension };
+function pruneContentBackups(directory) {
+  const entries = fs.readdirSync(directory, { withFileTypes: true })
+    .filter(entry => entry.isFile() && /^Content_.*\.json$/.test(entry.name))
+    .map(entry => ({ name: entry.name, time: fs.statSync(path.join(directory, entry.name)).mtimeMs }))
+    .sort((a, b) => b.time - a.time || b.name.localeCompare(a.name));
+  for (const entry of entries.slice(12)) fs.unlinkSync(path.join(directory, entry.name));
+}
+
+function runtimeDirectory(project, configured) {
+  const legacy = path.join(project, 'data');
+  const target = path.join(project, 'backend', 'data');
+  const requested = path.resolve(configured || target);
+  if (requested !== legacy && requested !== target) return requested;
+  for (const directory of [legacy, target]) {
+    if (fs.existsSync(directory) && fs.lstatSync(directory).isSymbolicLink()) throw new Error('Migration : dossier de données symbolique refusé.');
+  }
+  if (fs.existsSync(legacy)) {
+    if (fs.existsSync(path.join(legacy, 'update.lock'))) throw new Error('Migration des données : arrêter la mise à jour en cours avant de déplacer data.');
+    if (fs.existsSync(target) && fs.readdirSync(target).length) throw new Error('Deux dossiers de données existent. Fusion manuelle nécessaire pour préserver les données.');
+    if (fs.existsSync(target)) fs.rmdirSync(target); // uniquement un dossier vide
+    fs.renameSync(legacy, target);
+  }
+  return target;
+}
+module.exports = { atomicWrite, revision, imageExtension, pruneContentBackups, runtimeDirectory };

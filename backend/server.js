@@ -5,7 +5,7 @@
    Démarrage :   npm start                 (port 3210)
    Variables :
      ROOT  = dossier public (défaut : ../frontend)
-     DATA_DIR = dossier privé (défaut : ../data)
+     DATA_DIR = dossier privé (défaut : backend/data)
      PORT  = port d'écoute (défaut : 3210)
    L'API est disponible sous /api/ et gère :
      GET  /api/auth        -> { configured }
@@ -23,15 +23,19 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const { spawn } = require('child_process');
-const { atomicWrite, revision, imageExtension } = require('./storage');
+const { atomicWrite, revision, imageExtension, pruneContentBackups, runtimeDirectory } = require('./storage');
 
 const ROOT = path.resolve(process.env.ROOT || path.join(__dirname, '..', 'frontend'));
-const DATA_DIR = path.resolve(process.env.DATA_DIR || path.join(__dirname, '..', 'data'));
+const DATA_DIR = runtimeDirectory(path.resolve(__dirname, '..'), process.env.DATA_DIR);
 const PORT = process.env.PORT === undefined ? 3210 : parseInt(process.env.PORT, 10);
 const BACKUP_DIR = path.join(DATA_DIR, 'backups');
 const ADMIN_FILE = path.join(DATA_DIR, 'admin.json');
 const CONTENT_FILE = path.join(ROOT, 'content.json');
 const PROJECT = path.resolve(__dirname, '..');
+if (!fs.existsSync(path.join(DATA_DIR, 'update.lock'))) {
+  require('./deploy').migrateUpdates(PROJECT);
+  if (fs.existsSync(BACKUP_DIR)) pruneContentBackups(BACKUP_DIR);
+}
 const UPLOAD_DIR = path.join(DATA_DIR, 'uploads');
 const UPDATE_LOCK = path.join(DATA_DIR, 'update.lock');
 const BOOT = crypto.randomUUID();
@@ -72,6 +76,7 @@ function saveContent(content) {
   const backup = 'Content_' + new Date().toISOString().replace(/[:.]/g, '-') + '_' + crypto.randomUUID() + '.json';
   fs.copyFileSync(CONTENT_FILE, path.join(BACKUP_DIR, backup));
   atomicWrite(CONTENT_FILE, JSON.stringify(content, null, 2) + '\n', 0o644);
+  pruneContentBackups(BACKUP_DIR);
   return backup;
 }
 function checkWrite(res, expectedRevision) {
@@ -91,7 +96,7 @@ function updateAvailability() {
   if (process.platform === 'win32' || !process.env.pm_id) return 'La mise à jour automatique nécessite le serveur Linux géré par PM2.';
   if (ROOT !== path.join(PROJECT, 'frontend')) return 'La racine frontend doit appartenir au projet déployé.';
   const relativeData = path.relative(PROJECT, DATA_DIR);
-  if (!relativeData || ['frontend', 'backend'].some(name => relativeData === name || relativeData.startsWith(name + path.sep))) return 'DATA_DIR doit être hors des dossiers de code.';
+  if (DATA_DIR !== path.join(PROJECT, 'backend', 'data') && (!relativeData || ['frontend', 'backend', 'backups'].some(name => relativeData === name || relativeData.startsWith(name + path.sep)))) return 'DATA_DIR doit être backend/data ou un dossier externe au code et aux sauvegardes.';
   return null;
 }
 function sendJson(res, code, obj, extraHeaders) {
@@ -196,7 +201,7 @@ async function handleApi(req, res, route) {
         throw error;
       }
       try {
-        const job = path.join(PROJECT, '.deploy', crypto.randomUUID());
+        const job = path.join(PROJECT, 'backups', 'updates', crypto.randomUUID());
         fs.mkdirSync(job, { recursive: true });
         fs.copyFileSync(path.join(__dirname, 'deploy.js'), path.join(job, 'worker.cjs'));
         const configFile = path.join(job, 'config.json');

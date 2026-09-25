@@ -18,12 +18,12 @@ backend/                  Code exécuté côté serveur
   storage.js              Écritures atomiques et validation des images
   deploy.js               Mise à jour isolée et retour arrière
   tests/                  Tests d'intégration et de déploiement
-data/                     Données privées générées, ignorées par Git
-  admin.json              Mot de passe haché et secret de session
-  backups/                Sauvegardes du contenu
-  uploads/                Images envoyées depuis l'administration
-  update-status.json      Résultat de la dernière mise à jour
-.deploy/                  Versions préparées et précédentes (hors Git)
+  data/                   Données privées générées, ignorées par Git
+    admin.json            Mot de passe haché et secret de session
+    backups/              Sauvegardes du contenu
+    uploads/              Images envoyées depuis l'administration
+    update-status.json    Résultat de la dernière mise à jour
+backups/updates/                  Versions préparées et précédentes (hors Git)
 package.json              Commandes du projet
 ecosystem.config.js       Configuration PM2
 nginx.conf                Configuration nginx
@@ -52,7 +52,7 @@ Les chemins par défaut sont indépendants du dossier de lancement de Node :
 | --- | --- | --- |
 | `PORT` | `3210` | Port HTTP |
 | `ROOT` | `<projet>/frontend` | Dossier public, contenant `content.json` |
-| `DATA_DIR` | `<projet>/data` | Dossier privé des identifiants et sauvegardes |
+| `DATA_DIR` | `<projet>/backend/data` | Dossier privé des identifiants et sauvegardes |
 | `ENABLE_UPDATES` | désactivé | `1` active le bouton de déploiement sur Linux avec PM2 |
 
 Ne jamais placer `DATA_DIR` dans le dossier public.
@@ -67,13 +67,13 @@ Conserver le nombre d'éléments des tableaux pour respecter la structure HTML.
 Menus, boutons, coordonnées et liens restent dans `frontend/index.html`.
 
 Cliquer sur le **cadenas** en bas à droite : à la première connexion, le mot de passe saisi est
-haché avec scrypt et enregistré dans `data/admin.json`. La session dure 48 h.
+haché avec scrypt et enregistré dans `backend/data/admin.json`. La session dure 48 h.
 Cliquer sur un texte pour le modifier ; quitter la zone ou appuyer sur Entrée
 pour enregistrer, Échap pour annuler.
 Une fois connecté, cliquer sur le cadenas déconnecte immédiatement, sans confirmation.
 
 L'API reste accessible sous `/api/`. Les écritures nécessitent un jeton valide.
-Chaque écriture crée une sauvegarde horodatée unique dans `data/backups/`,
+Chaque écriture crée une sauvegarde horodatée unique dans `backend/data/backups/`,
 puis remplace atomiquement le JSON. Un contrôle de version refuse les écritures
 depuis une page périmée : recharger la page pour récupérer les dernières données.
 Le frontend lit `/api/content`, qui fournit le contenu et sa version.
@@ -84,7 +84,7 @@ En mode admin, déposer un fichier sur une image ou utiliser **Remplacer l'image
 (également disponible sur mobile). JPEG, PNG et WebP sont acceptés, jusqu'à 8 Mo.
 Le navigateur vérifie le décodage ; le serveur contrôle la signature du format,
 la taille, la session et la version du contenu. SVG n'est pas accepté en upload.
-Les fichiers sont enregistrés sous un nom unique dans `data/uploads/` et servis
+Les fichiers sont enregistrés sous un nom unique dans `backend/data/uploads/` et servis
 par `/api/media/`. L'ancienne image est conservée, notamment pour les sauvegardes.
 
 `content.json` contient un objet `images` avec les clés `hero`, `artTherapy`,
@@ -111,10 +111,10 @@ La mise à jour récupère
 `https://github.com/sctfic/AnouckMartin.com`, branche **main**. La source et la
 branche sont fixées côté serveur et ne proviennent jamais d'une requête client.
 
-Le téléchargement et la vérification syntaxique ont lieu dans `.deploy/`.
+Le téléchargement et la vérification syntaxique ont lieu dans `backups/updates/`.
 Seuls les dossiers `frontend/` et `backend/` sont déployés. **Tous les JSON
 existants dans ces dossiers sont recopiés à l'identique ; aucun JSON GitHub
-n'est importé.** Les images existantes, `data/`, les uploads et les fichiers à
+n'est importé.** Les images existantes, `backend/data/`, les uploads et les fichiers à
 la racine du projet sont conservés. Les ajouts ou migrations de schéma JSON
 doivent donc être faits séparément, sans écraser les données de production.
 
@@ -131,7 +131,7 @@ Installer Git et PM2 pour le même utilisateur que le service Node. Pour un dép
 privé, configurer un accès Git en lecture non interactif pour cet utilisateur ;
 ne pas ajouter de jeton GitHub au frontend ni dans `content.json`.
 Le processus doit pouvoir renommer les dossiers `frontend/` et `backend/`, écrire
-dans `.deploy/` et `data/`, et joindre GitHub. Garder `ROOT` sur `<projet>/frontend`.
+dans `backups/updates/` et `backend/data/`, et joindre GitHub. Garder `ROOT` sur `<projet>/frontend`.
 
 Appliquer le `nginx.conf` fourni (uploads : `client_max_body_size 12m`, cache des
 fichiers du code avec revalidation) et recréer le processus PM2 avec la configuration
@@ -142,13 +142,19 @@ Les anciens assets
 déjà en cache navigateur peuvent nécessiter un rechargement forcé à l'installation
 initiale. Après une mise à jour réussie, la page se recharge automatiquement.
 
-Les versions précédentes et sauvegardes ne sont pas purgées automatiquement.
+Les sauvegardes du code sont limitées à trois versions antérieures : la plus
+récente de chaque journée (date locale du serveur), sur trois journées maximum.
+La purge intervient après une mise à jour réussie et au démarrage. Les transactions
+nécessitant une récupération manuelle sont conservées jusqu’à résolution.
+Les sources Git temporaires sont supprimées après succès. Les sauvegardes de
+`content.json` sont limitées aux 12 plus récentes, après chaque écriture et au démarrage.
 En cas d'arrêt brutal de la machine pendant une permutation, arrêter PM2,
-consulter `.deploy/<identifiant>/transaction.json` et restaurer les dossiers
+consulter `backups/updates/<identifiant>/transaction.json` et restaurer les dossiers
 `previous-frontend` / `previous-backend` de cette transaction si nécessaire.
-Conserver les copies présentes avant toute restauration. Vérifier les JSON,
-rétablir `data/release.json` d'après `oldRelease`, puis seulement retirer
-`data/update.lock` et relancer PM2. Un échec de restauration garde volontairement
+Restaurer seulement le code du backend, sans déplacer ni remplacer `backend/data`.
+Conserver les JSON et images actuels avant toute restauration. Vérifier les JSON,
+rétablir `backend/data/release.json` d'après `oldRelease`, puis seulement retirer
+`backend/data/update.lock` et relancer PM2. Un échec de restauration garde volontairement
 ce verrou afin d'empêcher toute nouvelle écriture.
 
 ## Vérifications
@@ -165,15 +171,15 @@ temporaires et un port libre. Ils ne modifient pas le contenu du projet.
 Déployer l'arborescence complète dans `/home/alban/www/anouckmartin.psy`.
 nginx sert `/home/alban/www/anouckmartin.psy/frontend` et relaie `/api/`
 vers `http://127.0.0.1:3210`. Node doit pouvoir écrire dans
-`frontend/content.json` et `data/`.
+`frontend/content.json` et `backend/data/`.
 
 Pour migrer une installation existante :
 
 1. Arrêter le processus PM2 et sauvegarder les fichiers de production
    `content.json`, `admin.json` et `backups/` avant le transfert.
 2. Déployer les nouveaux dossiers. Replacer le contenu de production dans
-   `frontend/content.json`, les identifiants dans `data/admin.json` et les
-   sauvegardes dans `data/backups/`.
+   `frontend/content.json`, les identifiants dans `backend/data/admin.json` et les
+   sauvegardes dans `backend/data/backups/`.
 3. Installer la nouvelle configuration nginx ; exécuter `nginx -t`, puis
    recharger nginx si la vérification réussit.
 4. Recréer l'entrée PM2 pour prendre en compte le nouveau chemin du serveur :
@@ -193,3 +199,12 @@ correspondre au serveur cible.
 PM2 ne surveille pas les fichiers : le déploiement déclenche un seul redémarrage
 après la permutation complète des dossiers.
 Commandes utiles : `pm2 status`, `pm2 logs anouckmartin`, `npm run pm2:reload`.
+
+
+### Migration vers backend/data et backups/updates
+
+Cette transition doit être installée manuellement, PM2 arrêté, et sans mise à jour en cours. Sauvegarder les données de production, installer le nouveau code et ecosystem.config.js, puis recréer le service PM2 en production. Ne pas utiliser l'ancien bouton de mise à jour pour cette première migration : son worker utilise encore les anciens chemins.
+
+Au démarrage, le serveur déplace automatiquement l'ancien dossier data vers backend/data et .deploy vers backups/updates. Un DATA_DIR pointant vers l'ancien dossier data du projet est également migré ; un DATA_DIR externe personnalisé reste inchangé. Si les deux dossiers de données contiennent des fichiers, le serveur s'arrête sans fusionner ni écraser : les données doivent être rapprochées manuellement. Un verrou de mise à jour existant empêche la migration des données ; vérifier la transaction avant de le retirer.
+
+Le backend est désormais remplacé fichier par fichier en excluant toujours backend/data, également lors d'une restauration. Le téléchargement affiche le pourcentage et le nombre d'objets Git reçus (ce ne sont pas des fichiers). Chaque étape est affichée au moins 600 ms ; les étapes manquées pendant le redémarrage sont présentées avant le rechargement automatique.

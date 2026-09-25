@@ -993,13 +993,30 @@ a:hover {
     padding: var(--space-3xl) 0;
   }
 
+  /* Les animations ne doivent pas élargir la page au-delà de l'écran. */
+  .fade-in-left,
+  .fade-in-right {
+    transform: translateY(30px);
+  }
+
   /* Header mobile */
+  .approach__card {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .header__actions {
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
   .header__burger {
     display: flex;
   }
 
   .header__nav {
     position: fixed;
+    visibility: hidden;
     top: 0;
     right: -100%;
     width: 80%;
@@ -1017,6 +1034,7 @@ a:hover {
 
   .header__nav.open {
     right: 0;
+    visibility: visible;
   }
 
   .header__nav a {
@@ -1484,8 +1502,10 @@ a:hover {
 /* --- Cadenas administrateur fixe --- */
 .admin-update {
   position: fixed;
-  right: calc(max(12px, env(safe-area-inset-right)) + 48px);
-  bottom: max(12px, env(safe-area-inset-bottom));
+  right: 64px;
+  right: calc(64px + env(safe-area-inset-right, 0px));
+  bottom: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
   z-index: 900;
   display: flex;
   align-items: center;
@@ -1534,8 +1554,10 @@ a:hover {
 
 .admin-lock {
   position: fixed;
-  right: max(12px, env(safe-area-inset-right));
-  bottom: max(12px, env(safe-area-inset-bottom));
+  right: 16px;
+  right: calc(16px + env(safe-area-inset-right, 0px));
+  bottom: 16px;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
   z-index: 900;
   display: grid;
   place-items: center;
@@ -1851,4 +1873,21 @@ textarea.am-editor {
   .cabinet-card__map--wide {
     height: 300px;
   }
+}
+
+#am-download progress { display: block; width: 100%; height: 8px; accent-color: var(--color-accent-dark); }
+#am-download-label { font-size: 12px; }
+@media (max-width: 600px) {
+  .am-overlay { padding: 20px 12px; align-items: center; }
+  .am-modal, .am-update-dialog { box-sizing: border-box; width: calc(100vw - 24px); max-width: 360px; padding: 16px; max-height: calc(100dvh - 40px); overflow-y: auto; font-size: 13px; line-height: 1.4; }
+  .am-title, .am-update-dialog h2 { font-size: 19px; margin: 0 28px 10px 0; }
+  .am-modal p, .am-update-dialog p, #am-update-status { margin: 8px 0; font-size: 13px; }
+  .am-label, .am-hint { font-size: 12px; }
+  .am-pass { padding: 8px 10px; font-size: 16px; }
+  .am-submit, .am-logout { padding: 9px 12px; font-size: 13px; margin-top: 10px; }
+  .am-update-steps { display: grid; grid-template-columns: 1fr 1fr; column-gap: 22px; padding-left: 18px; margin: 10px 0; font-size: 12px; }
+  .am-update-steps li { padding: 2px 0; }
+  .am-update-recovery { padding: 8px; font-size: 12px; }
+  .am-update-recovery p, #am-update-version { font-size: 11px; }
+  .am-update-actions { gap: 8px; margin-top: 10px; }
 }

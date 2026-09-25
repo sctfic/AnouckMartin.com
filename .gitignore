@@ -1,4 +1,5 @@
 /data/
+/backend/data/
 /.deploy/
 /admin.json
 /backups/
