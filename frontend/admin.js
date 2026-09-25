@@ -340,7 +340,6 @@
     q('#am-update-status').textContent = status.message || (status.enabled ? 'Prêt à récupérer la dernière version du site.' : '');
     if (!status.enabled && status.reason) q('#am-update-status').textContent += ' ' + status.reason;
     q('#admin-update-btn span').textContent = status.busy ? 'Mise à jour en cours…' : 'Mettre à jour';
-    q('#am-update-cancel').textContent = status.busy || status.state === 'complete' || status.state === 'failed' ? 'Fermer' : 'Annuler';
     var steps = ['download', 'validate', 'install', 'restart', 'health', 'complete'];
     var index = steps.indexOf(status.stage);
     q('#am-update-steps').hidden = !status.state || status.state === 'idle';
@@ -630,7 +629,6 @@
     q('#admin-update-btn').addEventListener('click', openUpdateModal);
     q('#am-update').addEventListener('click', startUpdate);
     q('#am-update-close').addEventListener('click', function () { q('#am-update-dialog').close(); });
-    q('#am-update-cancel').addEventListener('click', function () { q('#am-update-dialog').close(); });
     var btn = q('#admin-btn');
     if (btn) btn.addEventListener('click', onAdminClick);
     document.addEventListener('click', editDelegate, true);

@@ -648,7 +648,15 @@ a:hover {
   opacity: 1;
 }
 
+.service-card__heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+}
+
 .service-card__icon {
+  flex-shrink: 0;
   width: 56px;
   height: 56px;
   border-radius: var(--radius-md);
@@ -657,15 +665,17 @@ a:hover {
   align-items: center;
   justify-content: center;
   font-size: 1.6rem;
-  margin-bottom: var(--space-lg);
+  margin-bottom: 0;
 }
 
 .service-card__title {
+  min-width: 0;
+  overflow-wrap: anywhere;
   font-family: var(--font-heading);
   font-size: var(--fs-xl);
   font-weight: 700;
   color: var(--color-deep);
-  margin-bottom: var(--space-sm);
+  margin-bottom: 0;
 }
 
 .service-card__desc {
@@ -1347,11 +1357,6 @@ a:hover {
   width: min(100%, 780px);
 }
 
-.service-card--global .service-card__icon {
-  margin-left: auto;
-  margin-right: auto;
-}
-
 /* --- À propos : visuel + encart formation --- */
 .about__visual {
   display: flex;
@@ -1885,7 +1890,7 @@ textarea.am-editor {
   .am-label, .am-hint { font-size: 12px; }
   .am-pass { padding: 8px 10px; font-size: 16px; }
   .am-submit, .am-logout { padding: 9px 12px; font-size: 13px; margin-top: 10px; }
-  .am-update-steps { display: grid; grid-template-columns: 1fr 1fr; column-gap: 22px; padding-left: 18px; margin: 10px 0; font-size: 12px; }
+  .am-update-steps { padding-left: 18px; margin: 10px 0; font-size: 12px; }
   .am-update-steps li { padding: 2px 0; }
   .am-update-recovery { padding: 8px; font-size: 12px; }
   .am-update-recovery p, #am-update-version { font-size: 11px; }

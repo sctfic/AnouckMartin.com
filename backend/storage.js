@@ -42,8 +42,11 @@ function runtimeDirectory(project, configured) {
     if (fs.existsSync(directory) && fs.lstatSync(directory).isSymbolicLink()) throw new Error('Migration : dossier de données symbolique refusé.');
   }
   if (fs.existsSync(legacy)) {
-    if (fs.existsSync(path.join(legacy, 'update.lock'))) throw new Error('Migration des données : arrêter la mise à jour en cours avant de déplacer data.');
     if (fs.existsSync(target) && fs.readdirSync(target).length) throw new Error('Deux dossiers de données existent. Fusion manuelle nécessaire pour préserver les données.');
+    // L'ancien worker doit retrouver son verrou, son état et release.json au
+    // même endroit après le redémarrage. Reporter la migration au prochain
+    // démarrage sans verrou, sans interrompre le service ni déplacer ses données.
+    if (fs.existsSync(path.join(legacy, 'update.lock'))) return legacy;
     if (fs.existsSync(target)) fs.rmdirSync(target); // uniquement un dossier vide
     fs.renameSync(legacy, target);
   }

@@ -190,5 +190,26 @@ test('migration des anciens déploiements et refus des données concurrentes', t
   assert.equal(f.read('data/admin.json'), 'legacy');
   assert.equal(f.read('backend/data/admin.json'), '{"hash":"keep-me"}');
   f.write('data/update.lock', 'locked');
-  assert.throws(() => require('../storage').runtimeDirectory(f.project), /en cours/);
+  assert.throws(() => require('../storage').runtimeDirectory(f.project), /Deux dossiers/);
+});
+
+test('redémarrage pendant une ancienne mise à jour : migration différée sans perdre le verrou', t => {
+  const f = fixture(t);
+  const project = path.join(f.project, 'transition');
+  fs.mkdirSync(path.join(project, 'backend'), { recursive: true });
+  f.write('transition/data/admin.json', '{"hash":"production"}');
+  f.write('transition/data/update.lock', 'worker actif');
+  f.write('transition/data/release.json', '{"release":"nouvelle-version"}');
+  const { runtimeDirectory } = require('../storage');
+  const legacy = path.join(project, 'data');
+  const target = path.join(project, 'backend/data');
+  assert.equal(runtimeDirectory(project), legacy);
+  assert.equal(runtimeDirectory(project, legacy), legacy);
+  assert.equal(fs.readFileSync(path.join(legacy, 'update.lock'), 'utf8'), 'worker actif');
+  assert.equal(fs.existsSync(target), false);
+  // Le worker termine ; le démarrage suivant effectue la migration.
+  fs.unlinkSync(path.join(legacy, 'update.lock'));
+  assert.equal(runtimeDirectory(project, legacy), target);
+  assert.equal(fs.readFileSync(path.join(target, 'admin.json'), 'utf8'), '{"hash":"production"}');
+  assert.equal(fs.readFileSync(path.join(target, 'release.json'), 'utf8'), '{"release":"nouvelle-version"}');
 });
