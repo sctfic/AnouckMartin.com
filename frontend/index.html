@@ -55,7 +55,7 @@
   </header>
 
   <!-- ===================== HERO ===================== -->
-  <section class="hero" id="hero">
+  <section class="hero" id="hero" data-image="hero">
     <div class="hero__bg"></div>
     <div class="hero__overlay"></div>
 
@@ -122,6 +122,8 @@
       <div class="note-band fade-in">
         <p>...</p>
       </div>
+      <img src="photo-ArtTherapie-0.jpg" data-image="artTherapy" alt="Pratique de l'art-thérapie"
+        class="art-therapy-photo fade-in" loading="lazy">
     </div>
   </section>
 
@@ -161,7 +163,7 @@
       <div class="about__grid">
         <div class="about__visual fade-in-left">
           <div class="about__image-wrapper">
-            <img src="photo-anouck-1.jpg"
+            <img src="photo-anouck-1.jpg" data-image="portrait"
               alt="Portrait d'Anouck Martin, psychopraticienne en psychosynthèse et art-thérapie à Laroin et Lasseube"
               class="about__image">
           </div>
@@ -245,7 +247,7 @@
         </div>
 
         <div class="approach__card approach__card--wide fade-in">
-          <img src="photo-bureau-0.jpg" alt="Le bureau de consultation d'Anouck Martin"
+          <img src="photo-bureau-0.jpg" data-image="office" alt="Le bureau de consultation d'Anouck Martin"
             class="approach__photo" loading="lazy">
           <h3>...</h3>
           <div class="approach__prose">
@@ -426,7 +428,7 @@
         <!-- Email -->
         <div class="contact-card fade-in" id="contact-email" onclick="window.location.href='mailto:anouckmartin.coach@gmail.com'">
           <div class="contact-card__icon">
-            <img src="contact-email.png" alt="Email" class="contact-card__email-icon">
+            <img src="contact-email.png" data-image="email" alt="Email" class="contact-card__email-icon">
           </div>
           <div class="contact-card__label">Email</div>
           <div class="contact-card__value">
@@ -437,7 +439,7 @@
         <!-- WhatsApp -->
         <div class="contact-card fade-in" id="contact-whatsapp" onclick="openWhatsApp()">
           <div class="contact-card__icon">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/4/4c/WhatsApp_Logo_green.svg" alt="WhatsApp"
+            <img src="https://upload.wikimedia.org/wikipedia/commons/4/4c/WhatsApp_Logo_green.svg" data-image="whatsapp" alt="WhatsApp"
               class="contact-card__whatsapp-icon">
           </div>
           <div class="contact-card__label">WhatsApp</div>
@@ -456,10 +458,59 @@
       <p class="footer__copy">&copy; 2026 Anouck Martin — Psychopraticienne en Psychosynthèse &amp; Art-Thérapie</p>
       <ul class="footer__links">
         <li><a href="#hero">Haut de page</a></li>
-        <li><button type="button" class="footer__admin" id="admin-btn" aria-label="Accès à l'administration">Admin</button></li>
       </ul>
     </div>
   </footer>
+
+  <button type="button" class="admin-lock" id="admin-btn"
+    aria-label="Administration : se connecter" title="Administration : se connecter">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+      <path class="admin-lock__closed" d="M7 11V7a5 5 0 0 1 10 0v4" />
+      <path class="admin-lock__open" d="M7 11V7a5 5 0 0 1 9.6-2" />
+      <rect x="4" y="11" width="16" height="11" rx="2" />
+      <path d="M12 15v3" />
+    </svg>
+  </button>
+
+  <button type="button" class="admin-update" id="admin-update-btn" hidden
+    aria-haspopup="dialog" aria-controls="am-update-dialog" title="Mettre à jour le site depuis GitHub">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M20 7v5h-5M4 17v-5h5" />
+      <path d="M6.1 6a8 8 0 0 1 13 3L20 12M4 12l.9 3A8 8 0 0 0 17.9 18" />
+    </svg>
+    <span>Mettre à jour</span>
+  </button>
+
+  <dialog class="am-update-dialog" id="am-update-dialog" aria-labelledby="am-update-title">
+    <button type="button" class="am-close" id="am-update-close" aria-label="Fermer la fenêtre de mise à jour">&times;</button>
+    <h2 id="am-update-title">Mettre à jour le site</h2>
+    <p>Récupérer le frontend et le backend depuis la branche <strong>main</strong> de GitHub ?</p>
+    <p>Les textes, les fichiers JSON et les images seront conservés. L’édition sera suspendue pendant l’opération et le site pourra être brièvement indisponible au redémarrage.</p>
+    <p id="am-update-status" role="status" aria-live="polite">Vérification du serveur…</p>
+    <ol class="am-update-steps" id="am-update-steps" aria-label="Étapes de la mise à jour" hidden>
+      <li data-stage="download">Téléchargement</li>
+      <li data-stage="validate">Vérification du code</li>
+      <li data-stage="install">Sauvegarde et installation</li>
+      <li data-stage="restart">Redémarrage du serveur</li>
+      <li data-stage="health">Vérification du site</li>
+      <li data-stage="complete">Mise à jour terminée</li>
+    </ol>
+    <p id="am-update-version"></p>
+    <details class="am-update-recovery" id="am-update-recovery">
+      <summary>Retour en arrière et sauvegardes</summary>
+      <p id="am-update-rollback">Si le redémarrage échoue, une restauration de la version précédente est tentée automatiquement.</p>
+      <p id="am-update-backup"></p>
+      <p>Pour une restauration manuelle, demander à la personne qui gère le serveur d’arrêter PM2, de sauvegarder les JSON et images actuels, puis de consulter le fichier <code>transaction.json</code> du déploiement. Les anciens dossiers portent les noms <code>previous-frontend</code> et <code>previous-backend</code>.</p>
+      <p>Conserver les JSON actuels lors du retour au code précédent, ainsi que <code>data/uploads/</code>. Rétablir la version dans <code>data/release.json</code>, retirer le verrou <code>data/update.lock</code> seulement après vérification, puis relancer PM2.</p>
+    </details>
+    <div class="am-update-actions">
+      <button type="button" class="am-submit" id="am-update" disabled>Confirmer la mise à jour</button>
+      <button type="button" class="am-logout" id="am-update-reload" hidden>Recharger le site</button>
+      <button type="button" class="am-logout" id="am-update-cancel">Annuler</button>
+    </div>
+  </dialog>
 
   <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"

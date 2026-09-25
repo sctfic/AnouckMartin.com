@@ -21,6 +21,8 @@
   var amEnabled = false;
   var editing = null;
   var saving = false;
+  var updating = false;
+  var updateTimer = null;
   var modalMode = 'login';
 
   function q(sel, root) { return (root || document).querySelector(sel); }
@@ -138,7 +140,7 @@
 
   /* ---------------- Édition en place ---------------- */
   function beginEdit(el) {
-    if (!amEnabled || editing || saving) return;
+    if (!amEnabled || editing || saving || updating) return;
     var content = current();
     if (!content) return;
     var path = el.getAttribute('data-edit');
@@ -220,10 +222,11 @@
     return fetch(API + '/content', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + tok },
-      body: JSON.stringify({ content: content })
+      body: JSON.stringify({ content: content, revision: window.AM.revision() })
     }).then(function (res) {
       return res.json().catch(function () { return {}; }).then(function (data) {
         if (!res.ok) throw new Error(data.error || ('Erreur serveur ' + res.status));
+        window.AM.setRevision(data.revision);
         return data;
       });
     });
@@ -243,13 +246,172 @@
     });
   }
 
+  /* ---------------- Images et mise à jour du code ---------------- */
+  function attachImageControls() {
+    qa('[data-image]').forEach(function (element) {
+      if (element.dataset.uploadReady) return;
+      element.dataset.uploadReady = 'true';
+      var button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'am-image-control';
+      button.textContent = 'Remplacer l’image';
+      button.setAttribute('aria-label', 'Remplacer : ' + (element.alt || 'image de fond'));
+      if (element.tagName === 'IMG') element.insertAdjacentElement('afterend', button);
+      else element.appendChild(button);
+      button.addEventListener('click', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        if (!amEnabled || saving || editing || updating) return;
+        var picker = document.createElement('input');
+        picker.type = 'file';
+        picker.accept = 'image/jpeg,image/png,image/webp';
+        picker.addEventListener('change', function () { uploadImage(element, picker.files[0]); });
+        picker.click();
+      });
+      element.addEventListener('dragover', function (event) {
+        if (!amEnabled) return;
+        event.preventDefault();
+        event.dataTransfer.dropEffect = 'copy';
+        element.classList.add('am-drop-target');
+      });
+      element.addEventListener('dragleave', function () { element.classList.remove('am-drop-target'); });
+      element.addEventListener('drop', function (event) {
+        if (!amEnabled) return;
+        event.preventDefault();
+        event.stopPropagation();
+        element.classList.remove('am-drop-target');
+        if (event.dataTransfer.files.length !== 1) return flash('Déposez une seule image à la fois.', true);
+        uploadImage(element, event.dataTransfer.files[0]);
+      });
+    });
+  }
+
+  async function uploadImage(element, file) {
+    if (!amEnabled || !file) return;
+    if (saving || editing || updating) return flash('Terminez la modification en cours avant de remplacer une image.', true);
+    if (file.size > 8 * 1024 * 1024) return flash('Image trop volumineuse : 8 Mo maximum.', true);
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) return flash('Choisissez une image JPEG, PNG ou WebP.', true);
+    saving = true;
+    document.body.classList.add('am-uploading');
+    try {
+      // Décoder avant d'envoyer pour refuser une image illisible.
+      var preview = new Image();
+      var objectURL = URL.createObjectURL(file);
+      try { preview.src = objectURL; await preview.decode(); }
+      finally { URL.revokeObjectURL(objectURL); }
+      var base64 = await new Promise(function (resolve, reject) {
+        var reader = new FileReader();
+        reader.onload = function () { resolve(String(reader.result).split(',')[1]); };
+        reader.onerror = function () { reject(new Error('Lecture du fichier impossible.')); };
+        reader.readAsDataURL(file);
+      });
+      var response = await fetch(API + '/images', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + sessionToken() },
+        body: JSON.stringify({ slot: element.dataset.image, base64: base64, revision: window.AM.revision() }),
+      });
+      var result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Envoi impossible.');
+      window.AM.setRevision(result.revision);
+      window.AM.apply(result.content);
+      flash('Image remplacée et enregistrée.');
+    } catch (error) { flash(error.message || 'Image illisible.', true); }
+    finally { saving = false; document.body.classList.remove('am-uploading'); }
+  }
+
+  function openUpdateModal() {
+    if (!amEnabled) return;
+    closeModal();
+    var dialog = q('#am-update-dialog');
+    if (!dialog.open) dialog.showModal();
+    q('#am-update').disabled = true;
+    refreshUpdateStatus();
+  }
+
+  function renderUpdateStatus(status) {
+    updating = !!status.busy;
+    q('#am-update').disabled = !status.enabled || status.busy;
+    q('#am-update-status').textContent = status.message || (status.enabled ? 'Prêt à récupérer la dernière version du site.' : '');
+    if (!status.enabled && status.reason) q('#am-update-status').textContent += ' ' + status.reason;
+    q('#admin-update-btn span').textContent = status.busy ? 'Mise à jour en cours…' : 'Mettre à jour';
+    q('#am-update-cancel').textContent = status.busy || status.state === 'complete' || status.state === 'failed' ? 'Fermer' : 'Annuler';
+    q('#am-update-reload').hidden = status.busy || !['complete', 'failed'].includes(status.state);
+    var steps = ['download', 'validate', 'install', 'restart', 'health', 'complete'];
+    var index = steps.indexOf(status.stage);
+    q('#am-update-steps').hidden = !status.state || status.state === 'idle';
+    qa('#am-update-steps li').forEach(function (item, i) {
+      item.classList.toggle('is-done', index > i || status.state === 'complete');
+      item.classList.toggle('is-current', index === i && status.state !== 'complete');
+      if (index === i) item.setAttribute('aria-current', 'step');
+      else item.removeAttribute('aria-current');
+    });
+    q('#am-update-dialog').dataset.state = status.state || 'idle';
+    q('#am-update-version').textContent = [
+      status.release ? 'Version GitHub : ' + status.release.slice(0, 12) : '',
+      status.previousRelease ? 'Version précédente : ' + status.previousRelease.slice(0, 12) : '',
+      status.at ? 'Dernier état : ' + new Date(status.at).toLocaleString('fr-FR') : '',
+    ].filter(Boolean).join(' · ');
+    q('#am-update-backup').textContent = status.backupDirectory
+      ? 'Dossier du déploiement sur le serveur : ' + status.backupDirectory
+      : 'Le dossier exact de sauvegarde sera indiqué dès le lancement.';
+    var recovery = 'Si le redémarrage échoue, une restauration de la version précédente est tentée automatiquement.';
+    if (status.rollback === 'restored') recovery = 'La version précédente a été restaurée automatiquement.';
+    else if (status.rollback === 'manual') recovery = 'Une intervention sur le serveur est nécessaire. L’édition reste verrouillée pour protéger les données.';
+    else if (status.rollback === 'available') recovery = 'Les dossiers de la version précédente sont conservés pour un retour en arrière manuel si nécessaire.';
+    else if (status.rollback === 'not-needed') recovery = 'La mise à jour a été annulée avant installation : le code précédent est toujours en place.';
+    q('#am-update-rollback').textContent = recovery;
+    if (status.state === 'failed') q('#am-update-recovery').open = true;
+  }
+
+  async function refreshUpdateStatus() {
+    clearTimeout(updateTimer);
+    try {
+      var response = await fetch(API + '/update', { cache: 'no-store', headers: { Authorization: 'Bearer ' + sessionToken() } });
+      if (response.status === 401) { updating = false; throw new Error('Session expirée. Reconnectez-vous.'); }
+      if (!response.ok) throw new Error('Vérification de la mise à jour indisponible.');
+      var status = await response.json();
+      renderUpdateStatus(status);
+      if (status.busy && status.state !== 'failed') updateTimer = setTimeout(refreshUpdateStatus, 2000);
+    } catch (error) {
+      q('#am-update-status').textContent = updating ? 'Redémarrage en cours… La vérification reprend automatiquement.' : error.message;
+      q('#am-update').disabled = true;
+      if (updating) updateTimer = setTimeout(refreshUpdateStatus, 3000);
+    }
+  }
+
+  async function startUpdate() {
+    if (saving || editing || updating) {
+      q('#am-update-status').textContent = 'Attendez la fin de la modification en cours.';
+      return;
+    }
+    updating = true;
+    q('#am-update').disabled = true;
+    q('#am-update-status').textContent = 'Démarrage de la mise à jour…';
+    try {
+      var response = await fetch(API + '/update', { method: 'POST', headers: { Authorization: 'Bearer ' + sessionToken() } });
+      var result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Mise à jour impossible.');
+      refreshUpdateStatus();
+    } catch (error) {
+      // La requête peut avoir été acceptée juste avant une coupure : vérifier son état.
+      q('#am-update-status').textContent = error.message;
+      refreshUpdateStatus();
+    }
+  }
+
   /* ---------------- Activation / désactivation ---------------- */
   function enableEditMode() {
     amEnabled = true;
     document.body.classList.add('am-admin');
+    q('#admin-update-btn').hidden = false;
     var btn = q('#admin-btn');
-    if (btn) { btn.textContent = 'Admin ✓'; btn.classList.add('is-active'); }
+    if (btn) {
+      btn.classList.add('is-active');
+      btn.setAttribute('aria-label', 'Administration : session ouverte');
+      btn.title = 'Administration : session ouverte';
+    }
     attachEditPaths();
+    attachImageControls();
   }
   function disableEditMode() {
     if (editing) {
@@ -258,9 +420,16 @@
       editing = null;
     }
     amEnabled = false;
+    q('#admin-update-btn').hidden = true;
+    q('#am-update-dialog').close();
+    clearTimeout(updateTimer);
     document.body.classList.remove('am-admin');
     var btn = q('#admin-btn');
-    if (btn) { btn.textContent = 'Admin'; btn.classList.remove('is-active'); }
+    if (btn) {
+      btn.classList.remove('is-active');
+      btn.setAttribute('aria-label', 'Administration : se connecter');
+      btn.title = 'Administration : se connecter';
+    }
   }
 
   /* ---------------- Fenêtre modale ---------------- */
@@ -282,6 +451,8 @@
       '<p class="am-hint" id="am-hint"></p>' +
       '<div class="am-session-actions" id="am-session-actions" style="display:none">' +
       '<p class="am-connected">Édition active&nbsp;: cliquez sur un bloc pour le modifier.</p>' +
+      '<p>Glissez une image sur une photo pour la remplacer, ou utilisez son bouton « Remplacer » (JPEG, PNG, WebP, 8 Mo maximum).</p>' +
+      '<button type="button" class="am-submit" id="am-open-update">Mettre à jour depuis GitHub</button>' +
       '<button type="button" class="am-logout" id="am-logout">Quitter le mode admin</button>' +
       '</div>' +
       '</div>';
@@ -296,6 +467,7 @@
       flash('Session terminée.');
     });
     q('#am-form', ov).addEventListener('submit', onFormSubmit);
+    q('#am-open-update', ov).addEventListener('click', openUpdateModal);
   }
   function closeModal() {
     var ov = q('.am-overlay');
@@ -405,12 +577,17 @@
 
   /* ---------------- Initialisation ---------------- */
   function boot() {
+    q('#admin-update-btn').addEventListener('click', openUpdateModal);
+    q('#am-update').addEventListener('click', startUpdate);
+    q('#am-update-close').addEventListener('click', function () { q('#am-update-dialog').close(); });
+    q('#am-update-cancel').addEventListener('click', function () { q('#am-update-dialog').close(); });
+    q('#am-update-reload').addEventListener('click', function () { window.location.reload(); });
     var btn = q('#admin-btn');
     if (btn) btn.addEventListener('click', onAdminClick);
     document.addEventListener('click', editDelegate, true);
 
     // Application du contenu : on (re)lie les blocs éditables
-    window.__onContentApplied = attachEditPaths;
+    window.__onContentApplied = function () { attachEditPaths(); attachImageControls(); };
 
     // Session persistante : réactivation automatique si le jeton est valide
     var sess = readSession();

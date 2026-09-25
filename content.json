@@ -1,27 +1,19 @@
 {
-  "images": {
-    "hero": "hero-bg-joyful.png",
-    "artTherapy": "photo-ArtTherapie-0.jpg",
-    "portrait": "photo-anouck-1.jpg",
-    "office": "photo-bureau-0.jpg",
-    "email": "contact-email.png",
-    "whatsapp": "https://upload.wikimedia.org/wikipedia/commons/4/4c/WhatsApp_Logo_green.svg"
-  },
   "hero": {
-        "label": "Pyrénées-Atlantiques (64)  Laroin, Lasseube et en visio",
+    "label": "Pyrénées-Atlantiques (64)  Laroin, Lasseube et en visio",
     "title": "Anouck Martin",
     "texte": [
-            "*Praticienne en Psychothérapie*      ",
-            "Psychosynthèse & Art-Thérapie  "
+      "*Praticienne en Psychothérapie*      ",
+      "Psychosynthèse & Art-Thérapie  "
     ]
   },
   "intro": {
-        "label": "",
+    "label": "",
     "title": "Prendre le temps de vous écouter",
     "texte": [
       "Vous traversez une période de fatigue, de stress, de questionnement ou de difficulté dans vos relations ?",
       "Vous aimeriez mieux comprendre ce que vous vivez, retrouver de la clarté et être davantage à l'écoute de vos besoins et de vos envies ?",
-            "Je vous accompagne dans cette exploration, avec une écoute attentive, dans un espace où vous pouvez prendre le temps de comprendre ce que vous vivez, sans jugement."
+      "Je vous accompagne dans cette exploration, avec une écoute attentive, dans un espace où vous pouvez prendre le temps de comprendre ce que vous vivez, sans jugement."
     ]
   },
   "situations": {
@@ -76,7 +68,7 @@
   },
   "about": {
     "label": "",
-    "title": "Qui est Anouck ?",
+    "title": "Qui suis-je ?",
     "texte": [
       "Anouck Martin est *psychopraticienne*, diplômée en soins infirmiers et formée à la psychosynthèse au terme de quatre années de formation.",
       "Son parcours dans le domaine du soin lui a permis de développer une expérience importante de l'écoute et de l'accompagnement des personnes dans des périodes de difficulté ou de changement.",
@@ -85,44 +77,44 @@
       "Anouck accorde une importance particulière au *respect du rythme et des choix* de chaque personne. Elle accompagne chacune dans son cheminement, sans imposer de direction.",
       "Elle est membre de la *Société Française de Psychosynthèse Thérapeutique (SFPT)*, association professionnelle reconnue par la *Fédération Française de Psychothérapie et Psychanalyse (FF2P)*. Elle est régulièrement supervisée dans sa pratique et poursuit une démarche de formation continue.",
       "Elle poursuit actuellement un *DU d'art-thérapie à Toulouse*, qu'elle validera en juin 2027.",
-            "Anouck est également *Professionnelle engagée Endonenette* partenaire de l'association *Endonenette*, qui rassemble des professionnels engagés pour le bien-être et l'accompagnement des femmes."
+      "Anouck est également *Professionnelle engagée Endonenette* partenaire de l'association *Endonenette*, qui rassemble des professionnels engagés pour le bien-être et l'accompagnement des femmes."
     ],
     "formation": [
-            {
-                "label": "🎓",
-                "title": "",
-                "texte": "Diplôme d'État infirmier"
-            },
-            {
-                "label": "🌀",
-                "title": "",
-                "texte": "Certificat de Praticienne en Psychosynthèse  ( 4 ans de formation)  "
-            },
-            {
-                 "label": "🌿",
-                 "title": "",
-                 "texte": "Plus de 10 ans d'expérience dans la relation de soins et d'accompagnement"
-            },
-            {
-                "label": "🤝",
-                "title": "",
-                "texte": "Membre de la Société Française de Psychosynthèse Thérapeutique (SFPT)"
-            },
-            {
-                "label": "🧭",
-                "title": "",
-                "texte": "Supervision régulière"
-            },
-            {
-                "label": "📚",
-                "title": "",
-                "texte": "Formation continue"
-            },
-            {
-                "label": "🎨",
-                "title": "",
-                "texte": "DU d'art-thérapie sur 2 ans à Toulouse — _en cours_"
-            }
+      {
+        "label": "🎓",
+        "title": "",
+        "texte": "Diplôme d'État infirmier"
+      },
+      {
+        "label": "🌀",
+        "title": "",
+        "texte": "Certificat de Praticienne en Psychosynthèse  ( 4 ans de formation)  "
+      },
+      {
+        "label": "🌿",
+        "title": "",
+        "texte": "Plus de 10 ans d'expérience dans la relation de soins et d'accompagnement"
+      },
+      {
+        "label": "🤝",
+        "title": "",
+        "texte": "Membre de la Société Française de Psychosynthèse Thérapeutique (SFPT)"
+      },
+      {
+        "label": "🧭",
+        "title": "",
+        "texte": "Supervision régulière"
+      },
+      {
+        "label": "📚",
+        "title": "",
+        "texte": "Formation continue"
+      },
+      {
+        "label": "🎨",
+        "title": "",
+        "texte": "DU d'art-thérapie sur 2 ans à Toulouse — _en cours_"
+      }
     ]
   },
   "approach": {
@@ -165,25 +157,25 @@
     "title": "Consultations",
     "texte": "Séances individuelles, en cabinet ou en visioconférence. Le rythme des rendez-vous est défini ensemble et peut évoluer au fil de l'accompagnement.",
     "facts": [
-            {
-                "label": "Séance individuelle",
-                "texte": "60 €"
-            },
-            {
-                "label": "Durée",
-                "texte": "1 heure"
-            },
-            {
-                "label": "Lieu",
-                "texte": "En cabinet ou en ligne"
-            }
+      {
+        "label": "Séance individuelle",
+        "texte": "60 €"
+      },
+      {
+        "label": "Durée",
+        "texte": "1 heure"
+      },
+      {
+        "label": "Lieu",
+        "texte": "En cabinet ou en ligne"
+      }
     ],
     "offer": {
       "label": "🌿",
       "title": "Un accompagnement global, adapté à vous",
       "texte": [
         "Chaque accompagnement est unique et évolue à votre rythme. Les séances individuelles (1 heure) s'appuient sur une écoute attentive et un dialogue face à face, et peuvent être enrichies, selon ce qui vous convient, par des médiateurs créatifs issus de la psychosynthèse : dessin, écriture ou visualisation.",
-                "Ce suivi global vous accompagne pour traverser les épreuves, apaiser les angoisses, gérer le stress et retrouver un équilibre intérieur — que ce soit au cabinet (Laroin ou Lasseube) ou en visioconférence"
+        "Ce suivi global vous accompagne pour traverser les épreuves, apaiser les angoisses, gérer le stress et retrouver un équilibre intérieur — que ce soit au cabinet (Laroin ou Lasseube) ou en visioconférence"
       ]
     }
   },

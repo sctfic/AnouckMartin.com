@@ -1,4 +1,5 @@
 /data/
+/.deploy/
 /admin.json
 /backups/
 node_modules/

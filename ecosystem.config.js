@@ -16,7 +16,8 @@ module.exports = {
       cwd: __dirname,           // racine du projet
       instances: 1,             // 1 seul process : écritures JSON séquentielles
       exec_mode: 'fork',
-      watch: true,              // redémarre à chaque upload de nouvelles versions du code
+      treekill: false,          // le worker détaché doit survivre au redémarrage du serveur
+      watch: false,             // le déploiement redémarre PM2 une fois la copie complète
       watch_delay: 1000,        // anti-rebond (évite les redémarrages multiples)
       ignore_watch: [           // ne pas redémarrer sur les données / fichiers générés
         'node_modules',
@@ -36,6 +37,7 @@ module.exports = {
       },
       env_production: {
         NODE_ENV: 'production',
+        ENABLE_UPDATES: '1',
         PORT: 3210,
         ROOT: require('path').join(__dirname, 'frontend'),
         DATA_DIR: require('path').join(__dirname, 'data')

@@ -168,8 +168,9 @@ function getCustomIcon() {
      *mot*  → gras      _mot_  → italique      ~mot~  → barré
    ============================================================ */
 
-const CONTENT_URL = 'content.json';
+const CONTENT_URL = '/api/content';
 var AM_STATE = null;
+var AM_REVISION = null;
 
 async function initContent() {
   // Aucun texte par défaut : on place d'abord « … » partout,
@@ -181,6 +182,7 @@ async function initContent() {
     const res = await fetch(CONTENT_URL, { cache: 'no-cache' });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     data = await res.json();
+    AM_REVISION = (res.headers.get('ETag') || '').replace(/"/g, '');
   } catch (err) {
     console.warn('content.json indisponible — les emplacements restent affichés « … ».', err);
     return;
@@ -428,6 +430,16 @@ function renderContact(b) {
 
 /* --- Application globale du contenu + pont pour le module admin --- */
 function renderAllContent(d) {
+  document.querySelectorAll('[data-image]').forEach(function (element) {
+    const source = d.images && d.images[element.dataset.image];
+    if (typeof source !== 'string') return;
+    let url;
+    try { url = new URL(source, window.location.href); }
+    catch (_) { return; }
+    if (!['http:', 'https:'].includes(url.protocol)) return;
+    if (element.tagName === 'IMG') element.src = url.href;
+    else document.documentElement.style.setProperty('--hero-image', 'url(' + JSON.stringify(url.href) + ')');
+  });
   renderHero(d.hero);
   renderIntro(d.intro);
   renderSituations(d.situations);
@@ -450,6 +462,8 @@ function AM_apply(data) {
 
 window.AM = {
   get: function () { return AM_STATE; },
+  revision: function () { return AM_REVISION; },
+  setRevision: function (value) { AM_REVISION = value; },
   apply: AM_apply,
   md: function (t) { return rich(t); }
 };

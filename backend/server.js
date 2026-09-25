@@ -22,6 +22,8 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const { spawn } = require('child_process');
+const { atomicWrite, revision, imageExtension } = require('./storage');
 
 const ROOT = path.resolve(process.env.ROOT || path.join(__dirname, '..', 'frontend'));
 const DATA_DIR = path.resolve(process.env.DATA_DIR || path.join(__dirname, '..', 'data'));
@@ -29,10 +31,15 @@ const PORT = process.env.PORT === undefined ? 3210 : parseInt(process.env.PORT, 
 const BACKUP_DIR = path.join(DATA_DIR, 'backups');
 const ADMIN_FILE = path.join(DATA_DIR, 'admin.json');
 const CONTENT_FILE = path.join(ROOT, 'content.json');
+const PROJECT = path.resolve(__dirname, '..');
+const UPLOAD_DIR = path.join(DATA_DIR, 'uploads');
+const UPDATE_LOCK = path.join(DATA_DIR, 'update.lock');
+const BOOT = crypto.randomUUID();
+const RELEASE = readJsonFile(path.join(DATA_DIR, 'release.json'), { release: 'initial' }).release;
+const IMAGE_SLOTS = ['hero', 'artTherapy', 'portrait', 'office', 'email', 'whatsapp'];
 
 const SESSION_TTL_MS = 48 * 60 * 60 * 1000;      // session : 48 h
-const BACKUP_AFTER_MS = 12 * 60 * 60 * 1000;     // sauvegarde si fichier modifié il y a > 12 h
-const MAX_BODY = 5 * 1024 * 1024;
+const MAX_BODY = 12 * 1024 * 1024;
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -57,8 +64,35 @@ function readJsonFile(file, fallback) {
   catch (e) { return fallback; }
 }
 function writeJsonFile(file, obj) {
-  fs.mkdirSync(path.dirname(file), { recursive: true });
-  fs.writeFileSync(file, JSON.stringify(obj, null, 2));
+  atomicWrite(file, JSON.stringify(obj, null, 2) + '\n');
+}
+function saveContent(content) {
+  JSON.parse(fs.readFileSync(CONTENT_FILE, 'utf8'));
+  fs.mkdirSync(BACKUP_DIR, { recursive: true });
+  const backup = 'Content_' + new Date().toISOString().replace(/[:.]/g, '-') + '_' + crypto.randomUUID() + '.json';
+  fs.copyFileSync(CONTENT_FILE, path.join(BACKUP_DIR, backup));
+  atomicWrite(CONTENT_FILE, JSON.stringify(content, null, 2) + '\n', 0o644);
+  return backup;
+}
+function checkWrite(res, expectedRevision) {
+  if (fs.existsSync(UPDATE_LOCK)) {
+    sendJson(res, 409, { error: 'Une mise à jour est en cours. Réessayez après son achèvement.' });
+    return false;
+  }
+  const content = JSON.parse(fs.readFileSync(CONTENT_FILE, 'utf8'));
+  if (expectedRevision !== revision(content)) {
+    sendJson(res, 409, { error: 'Le contenu a changé dans une autre session. Rechargez la page avant de modifier à nouveau.' });
+    return false;
+  }
+  return true;
+}
+function updateAvailability() {
+  if (process.env.ENABLE_UPDATES !== '1') return 'La mise à jour doit être activée sur le serveur (ENABLE_UPDATES=1).';
+  if (process.platform === 'win32' || !process.env.pm_id) return 'La mise à jour automatique nécessite le serveur Linux géré par PM2.';
+  if (ROOT !== path.join(PROJECT, 'frontend')) return 'La racine frontend doit appartenir au projet déployé.';
+  const relativeData = path.relative(PROJECT, DATA_DIR);
+  if (!relativeData || ['frontend', 'backend'].some(name => relativeData === name || relativeData.startsWith(name + path.sep))) return 'DATA_DIR doit être hors des dossiers de code.';
+  return null;
 }
 function sendJson(res, code, obj, extraHeaders) {
   const body = obj == null ? '' : JSON.stringify(obj);
@@ -132,6 +166,69 @@ function isAuthorized(req) {
 async function handleApi(req, res, route) {
   const method = req.method;
 
+  if (route === '/api/health' && method === 'GET') return sendJson(res, 200, { ok: true, boot: BOOT, release: RELEASE });
+
+  // Les fichiers téléversés sont publics, mais ne font jamais partie du code déployé.
+  if (route.startsWith('/api/media/') && (method === 'GET' || method === 'HEAD')) {
+    const name = route.slice('/api/media/'.length);
+    if (!/^[a-f0-9-]{36}\.(jpg|png|webp)$/.test(name)) return sendJson(res, 404, { error: 'Image inconnue.' });
+    const file = path.join(UPLOAD_DIR, name);
+    if (!fs.existsSync(file)) return sendJson(res, 404, { error: 'Image inconnue.' });
+    res.writeHead(200, { 'Content-Type': MIME[path.extname(name)], 'X-Content-Type-Options': 'nosniff', 'Cache-Control': 'public, max-age=31536000, immutable' });
+    if (method === 'HEAD') return res.end();
+    fs.createReadStream(file).pipe(res);
+    return;
+  }
+
+  if (route === '/api/update') {
+    if (!isAuthorized(req)) return sendJson(res, 401, { error: 'Non autorisé.' });
+    const unavailable = updateAvailability();
+    if (method === 'GET') return sendJson(res, 200, {
+      enabled: !unavailable, reason: unavailable, busy: fs.existsSync(UPDATE_LOCK),
+      ...readJsonFile(path.join(DATA_DIR, 'update-status.json'), { state: 'idle', message: '' }),
+    });
+    if (method === 'POST') {
+      if (unavailable) return sendJson(res, 409, { error: unavailable });
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+      try { fs.writeFileSync(UPDATE_LOCK, BOOT, { flag: 'wx', mode: 0o600 }); }
+      catch (error) {
+        if (error.code === 'EEXIST') return sendJson(res, 409, { error: 'Une mise à jour est déjà en cours.' });
+        throw error;
+      }
+      try {
+        const job = path.join(PROJECT, '.deploy', crypto.randomUUID());
+        fs.mkdirSync(job, { recursive: true });
+        fs.copyFileSync(path.join(__dirname, 'deploy.js'), path.join(job, 'worker.cjs'));
+        const configFile = path.join(job, 'config.json');
+        writeJsonFile(configFile, { project: PROJECT, dataDir: DATA_DIR, job, port: server.address().port, boot: BOOT, pmId: process.env.pm_id });
+        writeJsonFile(path.join(DATA_DIR, 'update-status.json'), { state: 'running', stage: 'download', backupDirectory: job, at: new Date().toISOString(), message: 'Préparation de la mise à jour…' });
+        const child = spawn(process.execPath, [path.join(job, 'worker.cjs'), configFile], { detached: true, stdio: 'ignore', windowsHide: true });
+        child.on('error', () => {
+          writeJsonFile(path.join(DATA_DIR, 'update-status.json'), { state: 'failed', message: 'Impossible de lancer la mise à jour.' });
+          if (fs.existsSync(UPDATE_LOCK)) fs.unlinkSync(UPDATE_LOCK);
+        });
+        child.unref();
+        return sendJson(res, 202, { ok: true });
+      } catch (error) { fs.unlinkSync(UPDATE_LOCK); throw error; }
+    }
+  }
+
+  if (route === '/api/images' && method === 'POST') {
+    if (!isAuthorized(req)) return sendJson(res, 401, { error: 'Non autorisé.' });
+    const body = await readBody(req);
+    if (!checkWrite(res, body.revision)) return;
+    if (!IMAGE_SLOTS.includes(body.slot)) return sendJson(res, 400, { error: 'Emplacement inconnu.' });
+    if (typeof body.base64 !== 'string' || !/^[A-Za-z0-9+/]+={0,2}$/.test(body.base64)) return sendJson(res, 400, { error: 'Image invalide.' });
+    const bytes = Buffer.from(body.base64, 'base64');
+    if (bytes.length > 8 * 1024 * 1024) return sendJson(res, 413, { error: 'Image trop volumineuse (8 Mo maximum).' });
+    const name = crypto.randomUUID() + '.' + imageExtension(bytes);
+    atomicWrite(path.join(UPLOAD_DIR, name), bytes);
+    const content = JSON.parse(fs.readFileSync(CONTENT_FILE, 'utf8'));
+    content.images = { ...content.images, [body.slot]: '/api/media/' + name };
+    const backup = saveContent(content);
+    return sendJson(res, 200, { ok: true, content, revision: revision(content), backup });
+  }
+
   // État : un mot de passe est-il déjà défini ?
   if (route === '/api/auth' && method === 'GET') {
     const cfg = readJsonFile(ADMIN_FILE, null);
@@ -144,6 +241,7 @@ async function handleApi(req, res, route) {
     if (cfg && cfg.hash) return sendJson(res, 409, { error: 'Un mot de passe est déjà configuré.' });
     const body = await readBody(req);
     const password = body && body.password;
+    if (fs.existsSync(ADMIN_FILE)) return sendJson(res, 409, { error: 'Un mot de passe est déjà configuré.' });
     if (typeof password !== 'string' || password.length < 4) {
       return sendJson(res, 400, { error: 'Mot de passe trop court (4 caractères minimum).' });
     }
@@ -180,34 +278,22 @@ async function handleApi(req, res, route) {
   // Lecture du contenu
   if (route === '/api/content' && method === 'GET') {
     if (!fs.existsSync(CONTENT_FILE)) return sendJson(res, 404, { error: 'content.json introuvable.' });
-    return sendJson(res, 200, readJsonFile(CONTENT_FILE, null));
+    const content = JSON.parse(fs.readFileSync(CONTENT_FILE, 'utf8'));
+    return sendJson(res, 200, content, { ETag: '"' + revision(content) + '"' });
   }
 
   // Enregistrement du contenu (jeton requis)
   if (route === '/api/content' && method === 'POST') {
     if (!isAuthorized(req)) return sendJson(res, 401, { error: 'Non autorisé. Reconnectez-vous.' });
     const body = await readBody(req);
+    if (!checkWrite(res, body.revision)) return;
     const content = body && body.content;
     if (!content || typeof content !== 'object' || Array.isArray(content)) {
       return sendJson(res, 400, { error: 'Contenu invalide (objet JSON attendu).' });
     }
 
-    let backupFile = null;
-    if (fs.existsSync(CONTENT_FILE)) {
-      const stat = fs.statSync(CONTENT_FILE);
-      if (Date.now() - stat.mtimeMs > BACKUP_AFTER_MS) {
-        const d = new Date();
-        const stamp = d.getFullYear() + '-' +
-          String(d.getMonth() + 1).padStart(2, '0') + '-' +
-          String(d.getDate()).padStart(2, '0');
-        fs.mkdirSync(BACKUP_DIR, { recursive: true });
-        const name = 'Content_' + stamp + '.json';
-        fs.writeFileSync(path.join(BACKUP_DIR, name), fs.readFileSync(CONTENT_FILE));
-        backupFile = name;
-      }
-    }
-    fs.writeFileSync(CONTENT_FILE, JSON.stringify(content, null, 2) + '\n');
-    return sendJson(res, 200, { ok: true, backup: backupFile });
+    const backupFile = saveContent(content);
+    return sendJson(res, 200, { ok: true, backup: backupFile, revision: revision(content) });
   }
 
   sendJson(res, 404, { error: 'Route inconnue.' });
@@ -240,10 +326,9 @@ function serveStatic(req, res, urlPath) {
 
 /* ---------------- Serveur ---------------- */
 const server = http.createServer(async function (req, res) {
-  const parsed = new URL(req.url, 'http://localhost');
-  const urlPath = decodeURIComponent(parsed.pathname);
-
   try {
+    const parsed = new URL(req.url, 'http://localhost');
+    const urlPath = decodeURIComponent(parsed.pathname);
     if (urlPath.indexOf('/api/') === 0) {
       await handleApi(req, res, urlPath);
       return;
