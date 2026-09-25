@@ -23,6 +23,7 @@
   var saving = false;
   var updating = false;
   var updateTimer = null;
+  var reloadAfterUpdate = false;
   var modalMode = 'login';
 
   function q(sel, root) { return (root || document).querySelector(sel); }
@@ -335,7 +336,6 @@
     if (!status.enabled && status.reason) q('#am-update-status').textContent += ' ' + status.reason;
     q('#admin-update-btn span').textContent = status.busy ? 'Mise à jour en cours…' : 'Mettre à jour';
     q('#am-update-cancel').textContent = status.busy || status.state === 'complete' || status.state === 'failed' ? 'Fermer' : 'Annuler';
-    q('#am-update-reload').hidden = status.busy || !['complete', 'failed'].includes(status.state);
     var steps = ['download', 'validate', 'install', 'restart', 'health', 'complete'];
     var index = steps.indexOf(status.stage);
     q('#am-update-steps').hidden = !status.state || status.state === 'idle';
@@ -370,9 +370,19 @@
       if (response.status === 401) { updating = false; throw new Error('Session expirée. Reconnectez-vous.'); }
       if (!response.ok) throw new Error('Vérification de la mise à jour indisponible.');
       var status = await response.json();
+      if (!amEnabled) return;
       renderUpdateStatus(status);
+      if (status.busy && status.state !== 'failed') reloadAfterUpdate = true;
+      if (status.state === 'failed') reloadAfterUpdate = false;
+      if (!status.busy && status.state === 'complete' && reloadAfterUpdate) {
+        reloadAfterUpdate = false;
+        q('#am-update-status').textContent = 'Mise à jour réussie. Rechargement du site…';
+        window.location.reload();
+        return;
+      }
       if (status.busy && status.state !== 'failed') updateTimer = setTimeout(refreshUpdateStatus, 2000);
     } catch (error) {
+      if (!amEnabled) return;
       q('#am-update-status').textContent = updating ? 'Redémarrage en cours… La vérification reprend automatiquement.' : error.message;
       q('#am-update').disabled = true;
       if (updating) updateTimer = setTimeout(refreshUpdateStatus, 3000);
@@ -391,6 +401,8 @@
       var response = await fetch(API + '/update', { method: 'POST', headers: { Authorization: 'Bearer ' + sessionToken() } });
       var result = await response.json();
       if (!response.ok) throw new Error(result.error || 'Mise à jour impossible.');
+      if (!amEnabled) return;
+      reloadAfterUpdate = true;
       refreshUpdateStatus();
     } catch (error) {
       // La requête peut avoir été acceptée juste avant une coupure : vérifier son état.
@@ -407,8 +419,8 @@
     var btn = q('#admin-btn');
     if (btn) {
       btn.classList.add('is-active');
-      btn.setAttribute('aria-label', 'Administration : session ouverte');
-      btn.title = 'Administration : session ouverte';
+      btn.setAttribute('aria-label', 'Administration : se déconnecter');
+      btn.title = 'Se déconnecter';
     }
     attachEditPaths();
     attachImageControls();
@@ -420,6 +432,7 @@
       editing = null;
     }
     amEnabled = false;
+    reloadAfterUpdate = false;
     q('#admin-update-btn').hidden = true;
     q('#am-update-dialog').close();
     clearTimeout(updateTimer);
@@ -460,12 +473,7 @@
 
     q('#am-close', ov).addEventListener('click', closeModal);
     ov.addEventListener('click', function (ev) { if (ev.target === ov) closeModal(); });
-    q('#am-logout', ov).addEventListener('click', function () {
-      clearSession();
-      disableEditMode();
-      closeModal();
-      flash('Session terminée.');
-    });
+    q('#am-logout', ov).addEventListener('click', logout);
     q('#am-form', ov).addEventListener('submit', onFormSubmit);
     q('#am-open-update', ov).addEventListener('click', openUpdateModal);
   }
@@ -530,8 +538,19 @@
   }
 
   /* ---------------- Bouton Admin ---------------- */
+  function logout() {
+    clearSession();
+    disableEditMode();
+    closeModal();
+    flash('Session terminée.');
+  }
+
   async function onAdminClick(ev) {
     ev.preventDefault();
+    if (amEnabled || readSession()) {
+      logout();
+      return;
+    }
     ensureModal();
 
     var configured = false;
@@ -552,10 +571,7 @@
       return;
     }
 
-    if (readSession()) {
-      enableEditMode();
-      openModal('session');
-    } else if (!configured) {
+    if (!configured) {
       openModal('setup');
     } else {
       openModal('login');
@@ -581,7 +597,6 @@
     q('#am-update').addEventListener('click', startUpdate);
     q('#am-update-close').addEventListener('click', function () { q('#am-update-dialog').close(); });
     q('#am-update-cancel').addEventListener('click', function () { q('#am-update-dialog').close(); });
-    q('#am-update-reload').addEventListener('click', function () { window.location.reload(); });
     var btn = q('#admin-btn');
     if (btn) btn.addEventListener('click', onAdminClick);
     document.addEventListener('click', editDelegate, true);
@@ -595,7 +610,7 @@
       fetch(API + '/me', { headers: { 'Authorization': 'Bearer ' + sess.token }, cache: 'no-store' })
         .then(function (r) { return r.json(); })
         .then(function (d) {
-          if (d && d.ok) enableEditMode();
+          if (d && d.ok && sessionToken() === sess.token) enableEditMode();
           else clearSession();
         })
         .catch(function () { /* hors ligne : lecture seule */ });

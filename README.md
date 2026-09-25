@@ -70,6 +70,7 @@ Cliquer sur le **cadenas** en bas à droite : à la première connexion, le mot 
 haché avec scrypt et enregistré dans `data/admin.json`. La session dure 48 h.
 Cliquer sur un texte pour le modifier ; quitter la zone ou appuyer sur Entrée
 pour enregistrer, Échap pour annuler.
+Une fois connecté, cliquer sur le cadenas déconnecte immédiatement, sans confirmation.
 
 L'API reste accessible sous `/api/`. Les écritures nécessitent un jeton valide.
 Chaque écriture crée une sauvegarde horodatée unique dans `data/backups/`,
@@ -95,13 +96,14 @@ images par défaut du HTML/CSS ; le premier upload ajoute sa référence.
 
 Après connexion, le bouton **Mettre à jour** apparaît à gauche du cadenas,
 fixe en bas à droite. Il ouvre une fenêtre de confirmation ; seul le clic sur
-**Confirmer la mise à jour** lance l'opération. Le bouton reste accessible si
+**Appliquer maintenant** lance l'opération puis recharge automatiquement le site
+après réussite. Le bouton reste accessible si
 le déploiement est indisponible, afin d'en afficher la raison.
 
 La fenêtre suit le téléchargement, la vérification, l'installation, le
 redémarrage et le contrôle du site. On peut la fermer et la rouvrir sans
-interrompre l'opération. Le résultat reste visible jusqu'au clic sur
-**Recharger le site**. La rubrique **Retour en arrière et sauvegardes** affiche
+interrompre l'opération. En cas d'échec, le résultat reste visible sans rechargement.
+La rubrique **Retour en arrière et sauvegardes** affiche
 le dossier de la transaction, les versions et le résultat d'une éventuelle
 restauration automatique, ainsi que les indications de restauration manuelle.
 
@@ -138,7 +140,7 @@ Le worker détaché doit survivre au redémarrage du serveur ; cette option est
 décrite dans la [documentation PM2](https://pm2.io/docs/runtime/reference/ecosystem-file/).
 Les anciens assets
 déjà en cache navigateur peuvent nécessiter un rechargement forcé à l'installation
-initiale. Après une mise à jour, utiliser **Recharger le site** dans la fenêtre.
+initiale. Après une mise à jour réussie, la page se recharge automatiquement.
 
 Les versions précédentes et sauvegardes ne sont pas purgées automatiquement.
 En cas d'arrêt brutal de la machine pendant une permutation, arrêter PM2,
